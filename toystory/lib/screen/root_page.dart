@@ -24,8 +24,7 @@ class _RootPageState extends State<RootPage> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            print('설정 버튼 눌림');
-            // 설정 버튼 기능 구현
+            _showSettingsDialog(context);
           },
           child: Icon(CupertinoIcons.settings),
         ),
@@ -61,6 +60,62 @@ class _RootPageState extends State<RootPage> {
           );
         },
       ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text("설정"),
+          content: Text("설정 메뉴에서 무엇을 하시겠습니까?"),
+          actions: <CupertinoDialogAction>[
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                print('개인 정보 수정 선택');
+              },
+              child: Text('개인 정보 수정'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                print('제작 현황 확인 선택');
+              },
+              child: Text('제작 현황 확인'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                print('배송 상태 확인 선택');
+              },
+              child: Text('배송 상태 확인'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                print('약관 조회 선택');
+              },
+              child: Text('약관 조회'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                print('로그아웃 선택');
+              },
+              isDestructiveAction: true,
+              child: Text('로그아웃'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('취소'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
