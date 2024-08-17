@@ -1,4 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'document_page.dart';
+import 'three_d_page.dart';
+import 'trash_page.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -10,9 +13,9 @@ class _RootPageState extends State<RootPage> {
 
   // 각 탭에 대응하는 페이지들
   final List<Widget> _pages = [
-    Center(child: Text('문서')),
-    Center(child: Text('3D')),
-    Center(child: Text('휴지통')),
+    DocumentPage(),
+    ThreeDPage(),
+    TrashPage(),
   ];
 
   @override
