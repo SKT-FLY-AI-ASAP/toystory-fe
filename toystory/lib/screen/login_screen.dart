@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
+import 'root_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -131,12 +132,12 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   CupertinoPageRoute(
-                      //     builder: (context) => const RootScreen(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => RootScreen(),
+                        ),
+                      );
                     },
                   ),
                 ),
