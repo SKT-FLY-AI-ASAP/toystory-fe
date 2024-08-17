@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -58,17 +59,62 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50),
-                const CupertinoTextField(
-                  placeholder: 'E-mail',
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+
+                // Row with Text and TextField for E-mail
+                Row(
+                  children: [
+                    SizedBox(width: 20),
+                    const SizedBox(
+                      width: 80, // 고정된 너비
+                      child: Text(
+                        '아이디',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: CupertinoColors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10), // 간격
+                    Expanded(
+                      child: CupertinoTextField(
+                        placeholder: 'E-mail',
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 10),
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                  ],
                 ),
                 const SizedBox(height: 20),
-                const CupertinoTextField(
-                  placeholder: 'PW',
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                  obscureText: true,
+
+                // Row with Text and TextField for PW
+                Row(
+                  children: [
+                    SizedBox(width: 20),
+                    const SizedBox(
+                      width: 80, // 고정된 너비
+                      child: Text(
+                        '비밀번호',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: CupertinoColors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10), // 간격
+                    Expanded(
+                      child: CupertinoTextField(
+                        placeholder: 'PW',
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 10),
+                        obscureText: true,
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                  ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
+
                 Container(
                   width: 300, // 버튼의 너비 설정
                   decoration: BoxDecoration(
@@ -76,8 +122,8 @@ class LoginScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30), // 모서리를 둥글게
                   ),
                   child: CupertinoButton(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0), // 패딩을 통해 높이 조정
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16.0), // 패딩을 통해 높이 조정
                     child: const Text(
                       '로그인',
                       style: TextStyle(
@@ -101,30 +147,30 @@ class LoginScreen extends StatelessWidget {
                     style: TextStyle(color: CupertinoColors.black),
                   ),
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   PageRouteBuilder(
-                    //     pageBuilder: (context, animation, secondaryAnimation) =>
-                    //         const SignUpScreen(),
-                    //     transitionsBuilder:
-                    //         (context, animation, secondaryAnimation, child) {
-                    //       const begin = 0.0;
-                    //       const end = 1.0;
-                    //       const curve = Curves.ease;
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const SignUpScreen(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const begin = 0.0;
+                          const end = 1.0;
+                          const curve = Curves.ease;
 
-                    //       final tween = Tween(begin: begin, end: end);
-                    //       final curvedAnimation = CurvedAnimation(
-                    //         parent: animation,
-                    //         curve: curve,
-                    //       );
+                          final tween = Tween(begin: begin, end: end);
+                          final curvedAnimation = CurvedAnimation(
+                            parent: animation,
+                            curve: curve,
+                          );
 
-                    //       return FadeTransition(
-                    //         opacity: tween.animate(curvedAnimation),
-                    //         child: child,
-                    //       );
-                    //     },
-                    //   ),
-                    // );
+                          return FadeTransition(
+                            opacity: tween.animate(curvedAnimation),
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
                   },
                 ),
               ],
