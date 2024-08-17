@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'document_page.dart';
 import 'three_d_page.dart';
 import 'trash_page.dart';
+import 'package:toystory/widget/reusable_dialog.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -74,35 +75,39 @@ class _RootPageState extends State<RootPage> {
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                print('개인 정보 수정 선택');
+                _showReusableDialog(
+                    context, "개인 정보 수정", "여기에 개인 정보 수정에 대한 내용이 들어갑니다.");
               },
               child: Text('개인 정보 수정'),
             ),
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                print('제작 현황 확인 선택');
+                _showReusableDialog(
+                    context, "제작 현황 확인", "여기에 제작 현황 확인에 대한 내용이 들어갑니다.");
               },
               child: Text('제작 현황 확인'),
             ),
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                print('배송 상태 확인 선택');
+                _showReusableDialog(
+                    context, "배송 상태 확인", "여기에 배송 상태 확인에 대한 내용이 들어갑니다.");
               },
               child: Text('배송 상태 확인'),
             ),
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                print('약관 조회 선택');
+                _showReusableDialog(
+                    context, "약관 조회", "여기에 약관 조회에 대한 내용이 들어갑니다.");
               },
               child: Text('약관 조회'),
             ),
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                print('로그아웃 선택');
+                _showLogoutActionSheet(context);
               },
               isDestructiveAction: true,
               child: Text('로그아웃'),
@@ -111,11 +116,48 @@ class _RootPageState extends State<RootPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('취소'),
+              child: Text('닫기'),
             ),
           ],
         );
       },
+    );
+  }
+
+  void _showReusableDialog(BuildContext context, String title, String content) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ReusableDialog(
+          title: title,
+          content: Text(content),
+        );
+      },
+    );
+  }
+
+  void _showLogoutActionSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('로그아웃'),
+        message: const Text('로그아웃 시 초기화면으로 돌아갑니다.'),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('로그아웃'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('취소'),
+        ),
+      ),
     );
   }
 }
