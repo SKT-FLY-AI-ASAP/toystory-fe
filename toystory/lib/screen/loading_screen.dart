@@ -1,7 +1,26 @@
 import 'package:flutter/cupertino.dart';
+import 'login_screen.dart';
 
-class LoadingScreen extends StatelessWidget {
+class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoadingScreenState createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 5초 후에 다음 페이지로 이동
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => const LoginScreen()), // 다음 페이지로 이동
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
