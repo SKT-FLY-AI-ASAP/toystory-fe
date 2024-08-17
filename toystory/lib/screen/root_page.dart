@@ -5,6 +5,7 @@ import 'trash_page.dart';
 import 'package:toystory/widget/reusable_dialog.dart';
 import 'package:toystory/widget/edit_profile_dialog.dart';
 import 'package:toystory/widget/production_dialog.dart';
+import 'package:toystory/widget/delivery_dialog.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -91,8 +92,7 @@ class _RootPageState extends State<RootPage> {
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                _showReusableDialog(
-                    context, "배송 상태 확인", "여기에 배송 상태 확인에 대한 내용이 들어갑니다.");
+                showDeliveryDialog(context);
               },
               child: Text('배송 상태 확인'),
             ),
