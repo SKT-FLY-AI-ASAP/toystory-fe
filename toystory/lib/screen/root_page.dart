@@ -6,6 +6,7 @@ import 'package:toystory/widget/reusable_dialog.dart';
 import 'package:toystory/widget/edit_profile_dialog.dart';
 import 'package:toystory/widget/production_dialog.dart';
 import 'package:toystory/widget/delivery_dialog.dart';
+import 'package:toystory/widget/terms_dialog.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -99,8 +100,7 @@ class _RootPageState extends State<RootPage> {
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                _showReusableDialog(
-                    context, "약관 조회", "여기에 약관 조회에 대한 내용이 들어갑니다.");
+                showTermsDialog(context);
               },
               child: Text('약관 조회'),
             ),
