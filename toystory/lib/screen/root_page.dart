@@ -3,7 +3,8 @@ import 'document_page.dart';
 import 'three_d_page.dart';
 import 'trash_page.dart';
 import 'package:toystory/widget/reusable_dialog.dart';
-import 'package:toystory/widget/edit_profile_dialog.dart'; // 새 파일 import
+import 'package:toystory/widget/edit_profile_dialog.dart';
+import 'package:toystory/widget/production_dialog.dart';
 
 class RootPage extends StatefulWidget {
   @override
@@ -83,8 +84,7 @@ class _RootPageState extends State<RootPage> {
             CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                _showReusableDialog(
-                    context, "제작 현황 확인", "여기에 제작 현황 확인에 대한 내용이 들어갑니다.");
+                showProductionDialog(context);
               },
               child: Text('제작 현황 확인'),
             ),
