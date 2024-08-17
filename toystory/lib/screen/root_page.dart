@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 
-class RootScreen extends StatefulWidget {
+class RootPage extends StatefulWidget {
   @override
-  _RootScreenState createState() => _RootScreenState();
+  _RootPageState createState() => _RootPageState();
 }
 
-class _RootScreenState extends State<RootScreen> {
+class _RootPageState extends State<RootPage> {
   int _currentIndex = 0;
 
   // 각 탭에 대응하는 페이지들

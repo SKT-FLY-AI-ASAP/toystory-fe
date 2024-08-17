@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'signup_screen.dart';
-import 'root_screen.dart';
+import 'signup_page.dart';
+import 'root_page.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +135,7 @@ class LoginScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) => RootScreen(),
+                          builder: (context) => RootPage(),
                         ),
                       );
                     },
@@ -152,7 +152,7 @@ class LoginScreen extends StatelessWidget {
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            const SignUpScreen(),
+                            const SignUpPage(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           const begin = 0.0;

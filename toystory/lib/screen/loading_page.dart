@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
-import 'login_screen.dart';
+import 'login_page.dart';
 
-class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+class LoadingPage extends StatefulWidget {
+  const LoadingPage({Key? key}) : super(key: key);
 
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  _LoadingPageState createState() => _LoadingPageState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
@@ -17,7 +17,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-            builder: (context) => const LoginScreen()), // 다음 페이지로 이동
+            builder: (context) => const LoginPage()), // 다음 페이지로 이동
       );
     });
   }
