@@ -1,24 +1,23 @@
 import 'package:flutter/cupertino.dart';
-//import 'root_screen.dart'; // TrashHandler를 가져오기 위함
-
-// class TrashPage extends StatelessWidget with TrashHandler {
-//   final VoidCallback onTrashPressed;
-
-//   TrashPage({required this.onTrashPressed});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text('휴지통 페이지'),
-//     );
-//   }
-// }
 
 class TrashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('휴지통 페이지'),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text('휴지통'),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            // 영구 삭제 기능 구현
+            print('휴지통 페이지의 휴지통 버튼 눌림');
+          },
+          child: Icon(CupertinoIcons.trash),
+        ),
+      ),
+      child: Center(
+        child: Text('휴지통에서 삭제된 이미지를 보여줍니다.'),
+      ),
     );
   }
 }

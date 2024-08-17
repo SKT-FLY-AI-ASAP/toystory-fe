@@ -11,7 +11,6 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   int _currentIndex = 0;
 
-  // 각 탭에 대응하는 페이지들
   final List<Widget> _pages = [
     DocumentPage(),
     ThreeDPage(),
@@ -20,36 +19,48 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.scribble),
-            label: '문서',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.cube),
-            label: '3D',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.trash),
-            label: '휴지통',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            print('설정 버튼 눌림');
+            // 설정 버튼 기능 구현
+          },
+          child: Icon(CupertinoIcons.settings),
+        ),
+      ),
+      child: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.scribble),
+              label: '문서',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.cube),
+              label: '3D',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.trash),
+              label: '휴지통',
+            ),
+          ],
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
+        tabBuilder: (context, index) {
+          return CupertinoTabView(
+            builder: (context) {
+              return _pages[index]; // 페이지 전환
+            },
+          );
         },
       ),
-      tabBuilder: (context, index) {
-        return CupertinoTabView(
-          builder: (context) {
-            return _pages[index];
-          },
-        );
-      },
     );
   }
 }
