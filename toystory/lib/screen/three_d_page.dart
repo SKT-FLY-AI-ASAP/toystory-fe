@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/settings_button.dart';
+import 'glb_viewer_page.dart';
 
 class ThreeDPage extends StatelessWidget {
   const ThreeDPage({Key? key}) : super(key: key);
@@ -39,6 +40,12 @@ class ThreeDPage extends StatelessWidget {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => My3DModel(),
+                        ),
+                      );
                       print('3D 아이템 $index 클릭됨');
                     },
                     child: Container(
