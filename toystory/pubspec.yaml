@@ -63,6 +63,7 @@ flutter:
   assets:
     - assets/img/2d/
     - assets/img/3d/
+    - assets/img/trash/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
