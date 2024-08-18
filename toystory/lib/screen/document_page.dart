@@ -1,31 +1,39 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'draw_page.dart';
+import 'package:toystory/widget/settings_button.dart';
 
 class DocumentPage extends StatelessWidget {
   const DocumentPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // 화면의 너비를 가져옴
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('3D'),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // 3D 이미지 삭제 기능 구현
-            print('3D 페이지의 휴지통 버튼 눌림');
-          },
-          child: Icon(CupertinoIcons.trash),
+        middle: Text('문서'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                print('문서 페이지의 휴지통 버튼 눌림');
+              },
+              child: Icon(CupertinoIcons.trash),
+            ),
+            const SizedBox(width: 8),
+            SettingsButton(),
+          ],
         ),
       ),
       child: SafeArea(
         child: GridView.count(
-          crossAxisCount: 5, // 한 행에 5개의 아이템을 배치
+          crossAxisCount: 5,
           padding: const EdgeInsets.all(16.0),
-          crossAxisSpacing: 16.0, // 아이템 사이의 가로 간격
-          mainAxisSpacing: 16.0, // 아이템 사이의 세로 간격
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
           children: List.generate(5, (index) {
             return Column(
               children: [
@@ -33,12 +41,13 @@ class DocumentPage extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () {
                       if (index == 0) {
-                        // Navigator.push(
-                        //   context,
-                        //   CupertinoPageRoute(
-                        //     builder: (context) => const DrawScreen(title: '제목'),
-                        //   ),
-                        // );
+                        // Use rootNavigator to hide the tab bar
+                        Navigator.of(context, rootNavigator: true).push(
+                          CupertinoPageRoute(
+                            fullscreenDialog: false,
+                            builder: (context) => const DrawPage(title: '제목'),
+                          ),
+                        );
                       }
                     },
                     child: Container(
@@ -48,11 +57,11 @@ class DocumentPage extends StatelessWidget {
                             : CupertinoColors.systemGrey,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      width: screenWidth / 6, // 아이템 너비 (화면의 1/6로 설정)
+                      width: screenWidth / 6,
                       child: index == 0
                           ? Center(
                               child: Icon(
-                                CupertinoIcons.add, // 첫 번째 박스에 아이콘을 표시
+                                CupertinoIcons.add,
                                 color: CupertinoColors.white,
                                 size: 40,
                               ),
@@ -60,14 +69,14 @@ class DocumentPage extends StatelessWidget {
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.asset(
-                                'assets/img/2d/image_$index.png', // 이미지 파일 경로
-                                fit: BoxFit.cover, // 이미지를 꽉 채우기
+                                'assets/img/2d/image_$index.png',
+                                fit: BoxFit.cover,
                               ),
                             ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8), // 아이템과 제목 사이의 간격
+                const SizedBox(height: 8),
                 Text(
                   index == 0 ? '새로 만들기' : '아이템 $index 제목',
                   style: const TextStyle(
