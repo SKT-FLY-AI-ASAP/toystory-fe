@@ -14,14 +14,14 @@ class ReusableDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13.0), // 다이얼로그 모서리 둥글게 설정
+        borderRadius: BorderRadius.circular(13.0), // Rounded dialog corners
       ),
-      backgroundColor: Colors.white, // 배경색을 white로 설정
+      backgroundColor: Colors.white, // Dialog background color
       child: Stack(
         children: [
           Container(
-            width: 540, // 다이얼로그 너비 지정
-            height: 620, // 다이얼로그 높이 지정
+            width: 540, // Dialog width
+            height: 620, // Dialog height
             padding: const EdgeInsets.all(32.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -31,7 +31,7 @@ class ReusableDialog extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'SF Pro Display', // 폰트 지정
+                    fontFamily: 'SF Pro Display', // Font family
                   ),
                 ),
                 const Divider(
@@ -43,7 +43,8 @@ class ReusableDialog extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: DefaultTextStyle(
                       style: const TextStyle(
-                        fontFamily: 'SF Pro Display', // 모든 텍스트에 적용할 폰트 지정
+                        fontFamily:
+                            'SF Pro Display', // Default font for content
                       ),
                       child: content,
                     ),
@@ -52,15 +53,15 @@ class ReusableDialog extends StatelessWidget {
               ],
             ),
           ),
-          // 오른쪽 상단에 닫기 버튼 추가
+          // Close button at the top right
           Positioned(
             right: 10,
             top: 10,
             child: GestureDetector(
               onTap: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
+                Navigator.of(context).pop(); // Close the dialog
               },
-              child: Icon(
+              child: const Icon(
                 Icons.close,
                 color: Colors.black,
                 size: 24,

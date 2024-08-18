@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
+import 'package:toystory/widget/confirm_3d_dialog.dart';
+import 'package:toystory/widget/reusable_dialog.dart';
 
 class DrawPage extends StatefulWidget {
   const DrawPage({super.key, required this.title});
@@ -67,6 +69,49 @@ class _DrawPageState extends State<DrawPage> {
 
   List<Widget> _buildActions(BuildContext context) {
     return [
+      CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () async {
+          // Show the confirm dialog on cube button press
+          final result = await showCupertinoDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return const Confirm3DTransformDialog(); // Your custom dialog
+            },
+          );
+
+          if (result == true) {
+            showCupertinoDialog(
+              context: context,
+              builder: (context) {
+                return CupertinoAlertDialog(
+                  title: const Text('3D 변환중'),
+                  content: Column(
+                    children: [
+                      const Text('3D 변환 중입니다...'),
+                      const SizedBox(height: 16), // 간격 추가
+                      Image.asset(
+                        'assets/img/loading/3D_loading.png', // 로컬 이미지 경로
+                        height: 150, // 이미지 크기
+                        width: 150,
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: const Text('확인'),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // 확인 버튼 누를 시 다이얼로그 닫기
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        },
+        child: const Icon(CupertinoIcons.cube),
+      ),
       ValueListenableBuilder(
         valueListenable: notifier,
         builder: (context, value, child) => CupertinoButton(
@@ -153,7 +198,6 @@ class _DrawPageState extends State<DrawPage> {
         _buildColorButton(context, color: CupertinoColors.systemGreen),
         _buildColorButton(context, color: CupertinoColors.systemBlue),
         _buildColorButton(context, color: CupertinoColors.systemYellow),
-        _buildEraserButton(context),
       ],
     );
   }
@@ -179,19 +223,6 @@ class _DrawPageState extends State<DrawPage> {
             },
           );
         });
-  }
-
-  Widget _buildEraserButton(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: notifier.select((value) => value is Erasing),
-      builder: (context, value, child) => ColorButton(
-        color: CupertinoColors.white,
-        outlineColor: CupertinoColors.black,
-        isActive: value,
-        onPressed: () => notifier.setEraser(),
-        child: const Icon(CupertinoIcons.clear),
-      ),
-    );
   }
 
   Widget _buildColorButton(
