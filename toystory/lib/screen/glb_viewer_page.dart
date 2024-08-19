@@ -27,8 +27,47 @@ class My3DModel extends StatelessWidget {
           child: Icon(CupertinoIcons.back),
         ),
         trailing: GestureDetector(
-          onTap: () {
-            _sendTo3DPrinter(context);
+          // onTap: () {
+          //   _sendTo3DPrinter(context);
+          // },
+          onTap: () async {
+            // Show the confirm dialog on cube button press
+            final result = await showCupertinoDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return const Sending3DDialog(); // Your custom dialog
+              },
+            );
+
+            if (result == true) {
+              showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text('3D 프린터 전송중'),
+                    content: Column(
+                      children: [
+                        const Text('3D 프린터로 전송중입니다...'),
+                        // const SizedBox(height: 16), // 간격 추가
+                        // Image.asset(
+                        //   'assets/img/loading/3D_loading.png', // 로컬 이미지 경로
+                        //   height: 150, // 이미지 크기
+                        //   width: 150,
+                        // ),
+                      ],
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: const Text('확인'),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // 확인 버튼 누를 시 다이얼로그 닫기
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
           },
           child: Icon(CupertinoIcons.share),
         ),
