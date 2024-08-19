@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+//import 'package:toystory/services/api_service.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -22,6 +22,7 @@ class _SignUpScreenState extends State<SignUpPage> {
 
   bool passwordsMatch = true;
   bool allFieldsFilled = false;
+  final Dio _dio = Dio(); // Dio 인스턴스 생성
 
   void checkFields() {
     setState(() {
@@ -46,7 +47,6 @@ class _SignUpScreenState extends State<SignUpPage> {
   Future<void> checkEmailVerificationStatus() async {
     final String email = emailController.text;
 
-    // 이메일 유효성 검사 추가
     if (!isEmailValid(email)) {
       showErrorDialog('유효한 이메일 형식이 아닙니다.');
       return;
@@ -55,19 +55,15 @@ class _SignUpScreenState extends State<SignUpPage> {
     final String url = 'http://52.79.56.132:8080/api/v1/user/email';
 
     try {
-      final http.Response response =
-          await http.get(Uri.parse('$url?email=$email') // GET 요청에 이메일 파라미터 추가
-              );
+      final response = await _dio.get(url, queryParameters: {'email': email});
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-
+        final responseData = response.data;
         if (responseData['message'] == "Verified.") {
           // 이메일 인증이 완료된 경우 회원가입 처리
           print('Email verified. Proceeding with sign up...');
           handleSignUp();
         } else {
-          // 이메일 인증이 완료되지 않은 경우 경고 메시지 표시
           showErrorDialog('이메일 인증이 완료되지 않았습니다. 이메일을 확인해 주세요.');
         }
       } else {
@@ -81,26 +77,18 @@ class _SignUpScreenState extends State<SignUpPage> {
     }
   }
 
-  // 이메일 인증 링크 전송 함수
   Future<void> sendVerificationLink() async {
-    final String url =
-        'http://52.79.56.132:8080/api/v1/user/link'; // 실제 엔드포인트로 변경
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
-    final Map<String, dynamic> body = {
-      'email': emailController.text, // 이메일 필드의 값을 보냄
-    };
+    final String url = 'http://52.79.56.132:8080/api/v1/user/link';
 
     try {
-      final http.Response response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(body),
+      final response = await _dio.post(
+        url,
+        data: {'email': emailController.text},
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
 
       if (response.statusCode == 201) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final responseData = response.data;
         print(responseData);
         showEmailVerificationDialog(context);
       } else {
@@ -109,16 +97,15 @@ class _SignUpScreenState extends State<SignUpPage> {
       }
     } catch (e) {
       print(e);
+      showErrorDialog('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
     }
   }
 
-  // 회원가입 처리 함수
   void handleSignUp() {
     // 실제 회원가입 처리 로직을 여기에 추가
     print('회원가입을 처리합니다.');
   }
 
-  // 이메일 인증 다이얼로그 띄우는 함수
   void showEmailVerificationDialog(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -140,7 +127,6 @@ class _SignUpScreenState extends State<SignUpPage> {
     );
   }
 
-  // 오류 발생 시 다이얼로그
   void showErrorDialog(String message) {
     showCupertinoDialog(
       context: context,
@@ -237,7 +223,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   suffix: CupertinoButton(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     onPressed: () {
-                      // 이메일 인증 다이얼로그 표시
                       sendVerificationLink();
                     },
                     child: const Text(
@@ -333,7 +318,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   child: const Text('회원가입'),
                   onPressed: agreeToTerms && passwordsMatch && allFieldsFilled
                       ? () {
-                          // 이메일 인증 확인 후 회원가입 처리
                           checkEmailVerificationStatus();
                         }
                       : null,
