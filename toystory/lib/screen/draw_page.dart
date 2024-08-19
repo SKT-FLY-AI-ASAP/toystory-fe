@@ -197,6 +197,12 @@ class _DrawPageState extends State<DrawPage> {
         _buildColorButton(context, color: CupertinoColors.systemGreen),
         _buildColorButton(context, color: CupertinoColors.systemBlue),
         _buildColorButton(context, color: CupertinoColors.systemYellow),
+        _buildColorButton(context, color: CupertinoColors.systemPink), // 추가된 색상
+        _buildColorButton(context,
+            color: CupertinoColors.systemPurple), // 추가된 색상
+        _buildColorButton(context, color: CupertinoColors.systemTeal), // 추가된 색상
+        _buildColorButton(context,
+            color: CupertinoColors.systemOrange), // 추가된 색상
         _buildEraserButton(context), // Add Eraser Button
       ],
     );
