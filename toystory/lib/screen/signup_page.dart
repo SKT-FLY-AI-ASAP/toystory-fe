@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
@@ -36,6 +36,51 @@ class _SignUpScreenState extends State<SignUpPage> {
     });
   }
 
+  bool isEmailValid(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  Future<void> checkEmailVerificationStatus() async {
+    final String email = emailController.text;
+
+    // 이메일 유효성 검사 추가
+    if (!isEmailValid(email)) {
+      showErrorDialog('유효한 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    final String url = 'http://52.79.56.132:8080/api/v1/user/email';
+
+    try {
+      final http.Response response =
+          await http.get(Uri.parse('$url?email=$email') // GET 요청에 이메일 파라미터 추가
+              );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        if (responseData['message'] == "Verified.") {
+          // 이메일 인증이 완료된 경우 회원가입 처리
+          print('Email verified. Proceeding with sign up...');
+          handleSignUp();
+        } else {
+          // 이메일 인증이 완료되지 않은 경우 경고 메시지 표시
+          showErrorDialog('이메일 인증이 완료되지 않았습니다. 이메일을 확인해 주세요.');
+        }
+      } else {
+        showErrorDialog('이메일 인증 상태 확인에 실패했습니다. 다시 시도해 주세요.');
+        print(response.statusCode);
+        print(email);
+      }
+    } catch (e) {
+      print(e);
+      showErrorDialog('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+    }
+  }
+
   // 이메일 인증 링크 전송 함수
   Future<void> sendVerificationLink() async {
     final String url =
@@ -65,6 +110,12 @@ class _SignUpScreenState extends State<SignUpPage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  // 회원가입 처리 함수
+  void handleSignUp() {
+    // 실제 회원가입 처리 로직을 여기에 추가
+    print('회원가입을 처리합니다.');
   }
 
   // 이메일 인증 다이얼로그 띄우는 함수
@@ -108,43 +159,6 @@ class _SignUpScreenState extends State<SignUpPage> {
           ],
         );
       },
-    );
-  }
-
-  Widget buildInputRow({
-    required String labelText,
-    required String placeholder,
-    bool isPassword = false,
-    TextEditingController? controller,
-    TextInputType keyboardType = TextInputType.text,
-    Widget? suffix,
-  }) {
-    return Row(
-      children: [
-        const SizedBox(width: 20),
-        SizedBox(
-          width: 120,
-          child: Text(
-            labelText,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: CupertinoTextField(
-            controller: controller,
-            placeholder: placeholder,
-            obscureText: isPassword,
-            keyboardType: keyboardType,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-            onChanged: (value) {
-              checkFields();
-            },
-            suffix: suffix,
-          ),
-        ),
-        const SizedBox(width: 20),
-      ],
     );
   }
 
@@ -224,7 +238,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     onPressed: () {
                       // 이메일 인증 다이얼로그 표시
-                      //showEmailVerificationDialog(context);
                       sendVerificationLink();
                     },
                     child: const Text(
@@ -320,7 +333,8 @@ class _SignUpScreenState extends State<SignUpPage> {
                   child: const Text('회원가입'),
                   onPressed: agreeToTerms && passwordsMatch && allFieldsFilled
                       ? () {
-                          // 회원가입 처리
+                          // 이메일 인증 확인 후 회원가입 처리
+                          checkEmailVerificationStatus();
                         }
                       : null,
                 ),
@@ -329,6 +343,43 @@ class _SignUpScreenState extends State<SignUpPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildInputRow({
+    required String labelText,
+    required String placeholder,
+    bool isPassword = false,
+    TextEditingController? controller,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffix,
+  }) {
+    return Row(
+      children: [
+        const SizedBox(width: 20),
+        SizedBox(
+          width: 120,
+          child: Text(
+            labelText,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: CupertinoTextField(
+            controller: controller,
+            placeholder: placeholder,
+            obscureText: isPassword,
+            keyboardType: keyboardType,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+            onChanged: (value) {
+              checkFields();
+            },
+            suffix: suffix,
+          ),
+        ),
+        const SizedBox(width: 20),
+      ],
     );
   }
 }
