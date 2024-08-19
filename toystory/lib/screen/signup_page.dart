@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -34,6 +36,37 @@ class _SignUpScreenState extends State<SignUpPage> {
     });
   }
 
+  // 이메일 인증 링크 전송 함수
+  Future<void> sendVerificationLink() async {
+    final String url =
+        'http://52.79.56.132:8080/api/v1/user/link'; // 실제 엔드포인트로 변경
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    final Map<String, dynamic> body = {
+      'email': emailController.text, // 이메일 필드의 값을 보냄
+    };
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
+        showEmailVerificationDialog(context);
+      } else {
+        showErrorDialog('Failed to send email. Please try again.');
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   // 이메일 인증 다이얼로그 띄우는 함수
   void showEmailVerificationDialog(BuildContext context) {
     showCupertinoDialog(
@@ -42,6 +75,28 @@ class _SignUpScreenState extends State<SignUpPage> {
         return CupertinoAlertDialog(
           title: const Text("이메일 인증"),
           content: const Text("이메일 수신함을 확인하세요."),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 오류 발생 시 다이얼로그
+  void showErrorDialog(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
           actions: [
             CupertinoDialogAction(
               isDefaultAction: true,
@@ -169,7 +224,8 @@ class _SignUpScreenState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     onPressed: () {
                       // 이메일 인증 다이얼로그 표시
-                      showEmailVerificationDialog(context);
+                      //showEmailVerificationDialog(context);
+                      sendVerificationLink();
                     },
                     child: const Text(
                       '인증',
