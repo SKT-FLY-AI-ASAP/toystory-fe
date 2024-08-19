@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-//import 'package:toystory/services/api_service.dart';
+import 'package:toystory/services/api_service.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -22,7 +21,7 @@ class _SignUpScreenState extends State<SignUpPage> {
 
   bool passwordsMatch = true;
   bool allFieldsFilled = false;
-  final Dio _dio = Dio(); // Dio 인스턴스 생성
+  final ApiService _apiService = ApiService(); // ApiService 인스턴스 생성
 
   void checkFields() {
     setState(() {
@@ -52,52 +51,23 @@ class _SignUpScreenState extends State<SignUpPage> {
       return;
     }
 
-    final String url = 'http://52.79.56.132:8080/api/v1/user/email';
-
     try {
-      final response = await _dio.get(url, queryParameters: {'email': email});
-
-      if (response.statusCode == 200) {
-        final responseData = response.data;
-        if (responseData['message'] == "Verified.") {
-          // 이메일 인증이 완료된 경우 회원가입 처리
-          print('Email verified. Proceeding with sign up...');
-          handleSignUp();
-        } else {
-          showErrorDialog('이메일 인증이 완료되지 않았습니다. 이메일을 확인해 주세요.');
-        }
-      } else {
-        showErrorDialog('이메일 인증 상태 확인에 실패했습니다. 다시 시도해 주세요.');
-        print(response.statusCode);
-        print(email);
-      }
+      await _apiService.checkEmailVerificationStatus(email);
+      // 이메일 인증 완료 후 로직 처리
+      handleSignUp();
     } catch (e) {
-      print(e);
-      showErrorDialog('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+      showErrorDialog(e.toString());
     }
   }
 
   Future<void> sendVerificationLink() async {
-    final String url = 'http://52.79.56.132:8080/api/v1/user/link';
+    final String email = emailController.text;
 
     try {
-      final response = await _dio.post(
-        url,
-        data: {'email': emailController.text},
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-
-      if (response.statusCode == 201) {
-        final responseData = response.data;
-        print(responseData);
-        showEmailVerificationDialog(context);
-      } else {
-        showErrorDialog('Failed to send email. Please try again.');
-        print(response.statusCode);
-      }
+      await _apiService.sendVerificationLink(email);
+      showEmailVerificationDialog(context);
     } catch (e) {
-      print(e);
-      showErrorDialog('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+      showErrorDialog(e.toString());
     }
   }
 
