@@ -9,20 +9,18 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpPage> {
-  bool agreeToTerms = false; // 약관 동의 상태 변수
+  bool agreeToTerms = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  final TextEditingController addressController =
-      TextEditingController(); // 주소 컨트롤러 추가
+  final TextEditingController addressController = TextEditingController();
 
-  bool passwordsMatch = true; // 비밀번호 일치 여부 상태 변수
-  bool allFieldsFilled = false; // 모든 필드가 입력되었는지 확인하는 변수
+  bool passwordsMatch = true;
+  bool allFieldsFilled = false;
 
-  // 입력 필드의 상태를 확인하는 함수
   void checkFields() {
     setState(() {
       passwordsMatch =
@@ -32,17 +30,39 @@ class _SignUpScreenState extends State<SignUpPage> {
           confirmPasswordController.text.isNotEmpty &&
           nicknameController.text.isNotEmpty &&
           phoneNumberController.text.isNotEmpty &&
-          addressController.text.isNotEmpty; // 주소도 비어있지 않도록 추가
+          addressController.text.isNotEmpty;
     });
   }
 
-  // 재사용 가능한 Row 생성 함수
+  // 이메일 인증 다이얼로그 띄우는 함수
+  void showEmailVerificationDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text("이메일 인증"),
+          content: const Text("이메일 수신함을 확인하세요."),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget buildInputRow({
     required String labelText,
     required String placeholder,
     bool isPassword = false,
     TextEditingController? controller,
     TextInputType keyboardType = TextInputType.text,
+    Widget? suffix,
   }) {
     return Row(
       children: [
@@ -65,6 +85,7 @@ class _SignUpScreenState extends State<SignUpPage> {
             onChanged: (value) {
               checkFields();
             },
+            suffix: suffix,
           ),
         ),
         const SizedBox(width: 20),
@@ -95,7 +116,7 @@ class _SignUpScreenState extends State<SignUpPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: 30, // Row의 높이를 30으로 고정
+                  height: 30,
                   child: Row(
                     children: [
                       Expanded(
@@ -140,12 +161,24 @@ class _SignUpScreenState extends State<SignUpPage> {
                   color: Color.fromRGBO(200, 200, 200, 0.6),
                 ),
                 const SizedBox(height: 20),
-
-                // 재사용 가능한 input row 함수 사용
                 buildInputRow(
                   labelText: '이메일',
                   placeholder: '이메일',
                   controller: emailController,
+                  suffix: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    onPressed: () {
+                      // 이메일 인증 다이얼로그 표시
+                      showEmailVerificationDialog(context);
+                    },
+                    child: const Text(
+                      '인증',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
@@ -162,8 +195,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   controller: confirmPasswordController,
                 ),
                 const SizedBox(height: 10),
-
-                // 비밀번호가 일치하지 않으면 경고 메시지 표시
                 if (!passwordsMatch)
                   const Text(
                     '비밀번호가 같지 않습니다',
@@ -172,18 +203,30 @@ class _SignUpScreenState extends State<SignUpPage> {
                       fontSize: 12,
                     ),
                   ),
-
                 const SizedBox(height: 10),
                 buildInputRow(
                   labelText: '닉네임',
                   placeholder: '닉네임',
                   controller: nicknameController,
+                  suffix: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    onPressed: () {
+                      // 닉네임 중복 확인 로직 추가
+                    },
+                    child: const Text(
+                      '중복확인',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
                   labelText: '주소',
                   placeholder: '주소',
-                  controller: addressController, // 주소 필드 추가
+                  controller: addressController,
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
@@ -193,8 +236,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   controller: phoneNumberController,
                 ),
                 const SizedBox(height: 20),
-
-                // 약관 동의 스위치
                 Row(
                   children: [
                     const SizedBox(width: 20),
@@ -219,15 +260,13 @@ class _SignUpScreenState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // 회원가입 버튼
                 CupertinoButton.filled(
                   child: const Text('회원가입'),
                   onPressed: agreeToTerms && passwordsMatch && allFieldsFilled
                       ? () {
                           // 회원가입 처리
                         }
-                      : null, // 약관 동의 및 필드가 비어있거나 비밀번호 일치하지 않으면 버튼 비활성화
+                      : null,
                 ),
               ],
             ),
