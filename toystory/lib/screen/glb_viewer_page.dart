@@ -1,12 +1,18 @@
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:toystory/widget/sending_3D_dialog.dart';
 import 'package:flutter/cupertino.dart';
 
 class My3DModel extends StatelessWidget {
   const My3DModel({super.key});
 
-  void _sendTo3DPrinter() {
-    // Add the functionality for sending to a 3D printer here.
-    print('Sending 3D model to printer...');
+  void _sendTo3DPrinter(BuildContext context) {
+    // Show the sending 3D dialog when the share icon is clicked
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const Sending3DDialog();
+      },
+    );
   }
 
   @override
@@ -21,7 +27,9 @@ class My3DModel extends StatelessWidget {
           child: Icon(CupertinoIcons.back),
         ),
         trailing: GestureDetector(
-          onTap: _sendTo3DPrinter,
+          onTap: () {
+            _sendTo3DPrinter(context);
+          },
           child: Icon(CupertinoIcons.share),
         ),
       ),
