@@ -108,4 +108,29 @@ class ApiService {
       throw Exception('회원가입에 실패했습니다. 다시 시도해주세요.');
     }
   }
+
+  //로그인
+  Future<void> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await _dio.post('/user/session', data: {
+        'email': email,
+        'password': password,
+      });
+
+      print(response.statusCode);
+
+      if (response.statusCode == 201) {
+        print('Login successful.');
+      } else {
+        print(response.data);
+        throw Exception('로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('로그인에 실패했습니다. 다시 시도해주세요.');
+    }
+  }
 }

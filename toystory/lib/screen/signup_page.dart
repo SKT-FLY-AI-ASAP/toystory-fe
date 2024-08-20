@@ -80,6 +80,9 @@ class _SignUpScreenState extends State<SignUpPage> {
 
     try {
       await _apiService.checkNicknameAvailability(nickname);
+      setState(() {
+        isNicknameChecked = true;
+      });
       showSuccessDialog('닉네임 사용이 가능합니다.');
     } catch (e) {
       showErrorDialog(e.toString());

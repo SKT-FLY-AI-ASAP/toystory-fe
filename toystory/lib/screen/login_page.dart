@@ -2,9 +2,76 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'signup_page.dart';
 import 'root_page.dart';
+import 'package:toystory/services/api_service.dart'; // Make sure to import your ApiService
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();
+
+  Future<void> handleLogin() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('오류'),
+          content: const Text('이메일과 비밀번호를 입력해주세요.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _apiService.login(email: email, password: password);
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => RootPage(),
+        ),
+      );
+    } catch (e) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('로그인 실패'),
+          content: Text(e.toString()),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +145,7 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(width: 10), // 간격
                     Expanded(
                       child: CupertinoTextField(
+                        controller: _emailController,
                         placeholder: 'E-mail',
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 10),
@@ -105,10 +173,13 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(width: 10), // 간격
                     Expanded(
                       child: CupertinoTextField(
+                        controller: _passwordController,
                         placeholder: 'PW',
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 10),
                         obscureText: true,
+                        onSubmitted: (_) =>
+                            handleLogin(), // Trigger login on Enter key press
                       ),
                     ),
                     SizedBox(width: 20),
@@ -131,14 +202,7 @@ class LoginPage extends StatelessWidget {
                         color: CupertinoColors.white, // 텍스트 색상
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => RootPage(),
-                        ),
-                      );
-                    },
+                    onPressed: handleLogin,
                   ),
                 ),
                 const SizedBox(height: 10),
