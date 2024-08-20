@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:toystory/services/api_service.dart';
+import 'package:toystory/screen/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -10,7 +11,10 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpPage> {
-  bool agreeToTerms = false;
+  bool agreeToTerms = false; // 약관 동의 확인 변수
+  bool isEmailVerified = false; // 이메일 인증 확인 변수
+  bool isNicknameChecked = false; // 닉네임 중복확인 완료 확인 변수
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -21,7 +25,7 @@ class _SignUpScreenState extends State<SignUpPage> {
 
   bool passwordsMatch = true;
   bool allFieldsFilled = false;
-  final ApiService _apiService = ApiService(); // ApiService 인스턴스 생성
+  final ApiService _apiService = ApiService();
 
   void checkFields() {
     setState(() {
@@ -43,8 +47,14 @@ class _SignUpScreenState extends State<SignUpPage> {
     return emailRegex.hasMatch(email);
   }
 
-  Future<void> checkEmailVerificationStatus() async {
+//이메일 인증링크 전송
+  Future<void> sendVerificationLink() async {
     final String email = emailController.text;
+
+    if (email.isEmpty) {
+      showErrorDialog('이메일을 입력해주세요.');
+      return;
+    }
 
     if (!isEmailValid(email)) {
       showErrorDialog('유효한 이메일 형식이 아닙니다.');
@@ -52,37 +62,110 @@ class _SignUpScreenState extends State<SignUpPage> {
     }
 
     try {
-      await _apiService.checkEmailVerificationStatus(email);
-      // 이메일 인증 완료 후 로직 처리
-      handleSignUp();
+      await _apiService.sendVerificationLink(email);
+      showSuccessDialog('이메일 인증 링크가 전송되었습니다.');
     } catch (e) {
       showErrorDialog(e.toString());
     }
   }
 
-  Future<void> sendVerificationLink() async {
+  //닉네임 중복 확인 for USER
+  Future<void> checkNicknameAvailability() async {
+    final String nickname = nicknameController.text;
+
+    if (nickname.isEmpty) {
+      showErrorDialog('닉네임을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await _apiService.checkNicknameAvailability(nickname);
+      showSuccessDialog('닉네임 사용이 가능합니다.');
+    } catch (e) {
+      showErrorDialog(e.toString());
+    }
+  }
+
+  //닉네임 중복 확인 for SIGNUP
+  Future<void> checkNicknameAvailability2() async {
+    final String nickname = nicknameController.text;
+
+    try {
+      await _apiService.checkNicknameAvailability(nickname);
+      setState(() {
+        isNicknameChecked = true;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+//이메일 인증 확인
+  Future<void> checkEmailVerificationStatus() async {
     final String email = emailController.text;
 
     try {
-      await _apiService.sendVerificationLink(email);
-      showEmailVerificationDialog(context);
+      await _apiService.checkEmailVerificationStatus(email);
+      setState(() {
+        isEmailVerified = true;
+      });
+      print('이메일 인증이 완료되었습니다');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+//회원가입
+  Future<void> handleSignUp() async {
+    final String email = emailController.text;
+
+    checkEmailVerificationStatus();
+
+    if (!isEmailVerified) {
+      showErrorDialog('이메일 인증이 완료되지 않았습니다. 이메일을 확인해 주세요.');
+      return;
+    }
+
+    checkNicknameAvailability2();
+
+    if (!isNicknameChecked) {
+      showErrorDialog('닉네임 중복확인이 완료되지 않았습니다.');
+      return;
+    }
+
+    final String password = passwordController.text;
+    final String nickname = nicknameController.text;
+    final String phone = phoneNumberController.text;
+    final String address = addressController.text;
+
+    try {
+      // 회원가입 요청
+      await _apiService.signup(
+        email: email,
+        password: password,
+        nickname: nickname,
+        phone: phone,
+        address: address,
+      );
+      showSuccessDialog('회원가입이 완료되었습니다.');
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+      );
     } catch (e) {
       showErrorDialog(e.toString());
     }
   }
 
-  void handleSignUp() {
-    // 실제 회원가입 처리 로직을 여기에 추가
-    print('회원가입을 처리합니다.');
-  }
-
-  void showEmailVerificationDialog(BuildContext context) {
+  void showErrorDialog(String message) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: const Text("이메일 인증"),
-          content: const Text("이메일 수신함을 확인하세요."),
+          title: const Text("Error"),
+          content: Text(message),
           actions: [
             CupertinoDialogAction(
               isDefaultAction: true,
@@ -97,12 +180,12 @@ class _SignUpScreenState extends State<SignUpPage> {
     );
   }
 
-  void showErrorDialog(String message) {
+  void showSuccessDialog(String message) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: const Text("Error"),
+          title: const Text("Success"),
           content: Text(message),
           actions: [
             CupertinoDialogAction(
@@ -143,8 +226,10 @@ class _SignUpScreenState extends State<SignUpPage> {
                 SizedBox(
                   height: 30,
                   child: Row(
+                    //네비게이션 바
                     children: [
                       Expanded(
+                        //뒤로가기 버튼
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: CupertinoButton(
@@ -235,7 +320,7 @@ class _SignUpScreenState extends State<SignUpPage> {
                   suffix: CupertinoButton(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     onPressed: () {
-                      // 닉네임 중복 확인 로직 추가
+                      checkNicknameAvailability(); // 중복확인 기능 실행
                     },
                     child: const Text(
                       '중복확인',
@@ -288,7 +373,7 @@ class _SignUpScreenState extends State<SignUpPage> {
                   child: const Text('회원가입'),
                   onPressed: agreeToTerms && passwordsMatch && allFieldsFilled
                       ? () {
-                          checkEmailVerificationStatus();
+                          handleSignUp();
                         }
                       : null,
                 ),
@@ -300,6 +385,7 @@ class _SignUpScreenState extends State<SignUpPage> {
     );
   }
 
+//이건 그냥 디자인용 함수
   Widget buildInputRow({
     required String labelText,
     required String placeholder,

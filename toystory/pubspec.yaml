@@ -39,6 +39,7 @@ dependencies:
   model_viewer_plus: ^1.8.0
   flutter_cube: ^0.1.0
   http: ^0.13.3
+  dio: ^5.3.3
 
 dev_dependencies:
   flutter_test:
