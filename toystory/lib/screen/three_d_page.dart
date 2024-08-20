@@ -2,6 +2,62 @@ import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/settings_button.dart';
 import 'glb_viewer_page.dart';
 
+// 3D 아이템 모델 클래스
+class ThreeDItem {
+  final int contentId;
+  final String contentTitle;
+  final int userId;
+  final String contentUrl;
+  final bool isRemoved;
+
+  ThreeDItem({
+    required this.contentId,
+    required this.contentTitle,
+    required this.userId,
+    required this.contentUrl,
+    required this.isRemoved,
+  });
+}
+
+// 샘플 데이터 리스트
+List<ThreeDItem> sampleThreeDItems = [
+  ThreeDItem(
+    contentId: 1,
+    contentTitle: '3D Model 1',
+    userId: 101,
+    contentUrl: 'assets/img/3d/image_1.png',
+    isRemoved: false,
+  ),
+  ThreeDItem(
+    contentId: 2,
+    contentTitle: '3D Model 2',
+    userId: 102,
+    contentUrl: 'assets/img/3d/image_2.png',
+    isRemoved: false,
+  ),
+  ThreeDItem(
+    contentId: 3,
+    contentTitle: '3D Model 3',
+    userId: 103,
+    contentUrl: 'assets/img/3d/image_3.png',
+    isRemoved: false,
+  ),
+  ThreeDItem(
+    contentId: 4,
+    contentTitle: '3D Model 4',
+    userId: 104,
+    contentUrl: 'assets/img/3d/image_4.png',
+    isRemoved: false,
+  ),
+  // ThreeDItem(
+  //   contentId: 5,
+  //   contentTitle: '3D Model 5',
+  //   userId: 105,
+  //   contentUrl: 'assets/img/3d/image_5.png',
+  //   isRemoved: false,
+  // ),
+];
+
 class ThreeDPage extends StatelessWidget {
   const ThreeDPage({Key? key}) : super(key: key);
 
@@ -33,8 +89,9 @@ class ThreeDPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           crossAxisSpacing: 16.0, // 아이템 사이의 가로 간격
           mainAxisSpacing: 16.0, // 아이템 사이의 세로 간격
-          children: List.generate(5, (index) {
-            // 40개의 아이템 생성
+          children: List.generate(sampleThreeDItems.length, (index) {
+            final item = sampleThreeDItems[index]; // 샘플 데이터에서 아이템 가져오기
+
             return Column(
               children: [
                 Expanded(
@@ -43,10 +100,10 @@ class ThreeDPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) => My3DModel(),
+                          builder: (context) => My3DModel(), // 3D 모델 뷰어로 이동
                         ),
                       );
-                      print('3D 아이템 $index 클릭됨');
+                      print('${item.contentTitle} 클릭됨');
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -57,7 +114,7 @@ class ThreeDPage extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.asset(
-                          'assets/img/3d/image_$index.png',
+                          item.contentUrl,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -66,7 +123,7 @@ class ThreeDPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8), // 아이템과 제목 사이의 간격
                 Text(
-                  '3D아이템 $index 제목',
+                  item.contentTitle, // 3D 아이템의 제목 표시
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
