@@ -3,6 +3,7 @@ import 'screen/loading_page.dart';
 
 void main() {
   runApp(CupertinoApp(
+    debugShowCheckedModeBanner: false,
     home: LoadingPage(),
   ));
 }
