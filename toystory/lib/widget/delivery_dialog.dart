@@ -38,11 +38,31 @@ void showDeliveryDialog(BuildContext context) {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
+                CupertinoButton(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: CupertinoColors.systemGrey5,
                   onPressed: () {
-                    // 첫 번째 날짜 선택 버튼의 동작
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          height: 250,
+                          color: Colors.white,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: DateTime.now(),
+                            onDateTimeChanged: (DateTime newDate) {
+                              // 시작 날짜 선택 로직 추가
+                            },
+                          ),
+                        );
+                      },
+                    );
                   },
-                  child: Text('시작 날짜 선택'),
+                  child: Text(
+                    "시작 날짜 선택",
+                    style: TextStyle(color: CupertinoColors.activeBlue),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -51,11 +71,31 @@ void showDeliveryDialog(BuildContext context) {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                ElevatedButton(
+                CupertinoButton(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: CupertinoColors.systemGrey5,
                   onPressed: () {
-                    // 두 번째 날짜 선택 버튼의 동작
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          height: 250,
+                          color: Colors.white,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: DateTime.now(),
+                            onDateTimeChanged: (DateTime newDate) {
+                              // 종료 날짜 선택 로직 추가
+                            },
+                          ),
+                        );
+                      },
+                    );
                   },
-                  child: Text('종료 날짜 선택'),
+                  child: Text(
+                    "종료 날짜 선택",
+                    style: TextStyle(color: CupertinoColors.activeBlue),
+                  ),
                 ),
               ],
             ),
