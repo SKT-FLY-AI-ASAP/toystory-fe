@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:toystory/services/api_service.dart';
+import 'package:toystory/screen/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -9,20 +11,22 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpPage> {
-  bool agreeToTerms = false; // 약관 동의 상태 변수
+  bool agreeToTerms = false; // 약관 동의 확인 변수
+  bool isEmailVerified = false; // 이메일 인증 확인 변수
+  bool isNicknameChecked = false; // 닉네임 중복확인 완료 확인 변수
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  final TextEditingController addressController =
-      TextEditingController(); // 주소 컨트롤러 추가
+  final TextEditingController addressController = TextEditingController();
 
-  bool passwordsMatch = true; // 비밀번호 일치 여부 상태 변수
-  bool allFieldsFilled = false; // 모든 필드가 입력되었는지 확인하는 변수
+  bool passwordsMatch = true;
+  bool allFieldsFilled = false;
+  final ApiService _apiService = ApiService();
 
-  // 입력 필드의 상태를 확인하는 함수
   void checkFields() {
     setState(() {
       passwordsMatch =
@@ -32,43 +36,171 @@ class _SignUpScreenState extends State<SignUpPage> {
           confirmPasswordController.text.isNotEmpty &&
           nicknameController.text.isNotEmpty &&
           phoneNumberController.text.isNotEmpty &&
-          addressController.text.isNotEmpty; // 주소도 비어있지 않도록 추가
+          addressController.text.isNotEmpty;
     });
   }
 
-  // 재사용 가능한 Row 생성 함수
-  Widget buildInputRow({
-    required String labelText,
-    required String placeholder,
-    bool isPassword = false,
-    TextEditingController? controller,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Row(
-      children: [
-        const SizedBox(width: 20),
-        SizedBox(
-          width: 120,
-          child: Text(
-            labelText,
-            style: const TextStyle(fontSize: 16),
-          ),
+  bool isEmailValid(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+//이메일 인증링크 전송
+  Future<void> sendVerificationLink() async {
+    final String email = emailController.text;
+
+    if (email.isEmpty) {
+      showErrorDialog('이메일을 입력해주세요.');
+      return;
+    }
+
+    if (!isEmailValid(email)) {
+      showErrorDialog('유효한 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    try {
+      await _apiService.sendVerificationLink(email);
+      showSuccessDialog('이메일 인증 링크가 전송되었습니다.');
+    } catch (e) {
+      showErrorDialog(e.toString());
+    }
+  }
+
+  //닉네임 중복 확인 for USER
+  Future<void> checkNicknameAvailability() async {
+    final String nickname = nicknameController.text;
+
+    if (nickname.isEmpty) {
+      showErrorDialog('닉네임을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await _apiService.checkNicknameAvailability(nickname);
+      setState(() {
+        isNicknameChecked = true;
+      });
+      showSuccessDialog('닉네임 사용이 가능합니다.');
+    } catch (e) {
+      showErrorDialog(e.toString());
+    }
+  }
+
+  //닉네임 중복 확인 for SIGNUP
+  Future<void> checkNicknameAvailability2() async {
+    final String nickname = nicknameController.text;
+
+    try {
+      await _apiService.checkNicknameAvailability(nickname);
+      setState(() {
+        isNicknameChecked = true;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+//이메일 인증 확인
+  Future<void> checkEmailVerificationStatus() async {
+    final String email = emailController.text;
+
+    try {
+      await _apiService.checkEmailVerificationStatus(email);
+      setState(() {
+        isEmailVerified = true;
+      });
+      print('이메일 인증이 완료되었습니다');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+//회원가입
+  Future<void> handleSignUp() async {
+    final String email = emailController.text;
+
+    checkEmailVerificationStatus();
+
+    if (!isEmailVerified) {
+      showErrorDialog('이메일 인증이 완료되지 않았습니다. 이메일을 확인해 주세요.');
+      return;
+    }
+
+    checkNicknameAvailability2();
+
+    if (!isNicknameChecked) {
+      showErrorDialog('닉네임 중복확인이 완료되지 않았습니다.');
+      return;
+    }
+
+    final String password = passwordController.text;
+    final String nickname = nicknameController.text;
+    final String phone = phoneNumberController.text;
+    final String address = addressController.text;
+
+    try {
+      // 회원가입 요청
+      await _apiService.signup(
+        email: email,
+        password: password,
+        nickname: nickname,
+        phone: phone,
+        address: address,
+      );
+      showSuccessDialog('회원가입이 완료되었습니다.');
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => LoginPage(),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: CupertinoTextField(
-            controller: controller,
-            placeholder: placeholder,
-            obscureText: isPassword,
-            keyboardType: keyboardType,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-            onChanged: (value) {
-              checkFields();
-            },
-          ),
-        ),
-        const SizedBox(width: 20),
-      ],
+      );
+    } catch (e) {
+      showErrorDialog(e.toString());
+    }
+  }
+
+  void showErrorDialog(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSuccessDialog(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text("Success"),
+          content: Text(message),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -95,10 +227,12 @@ class _SignUpScreenState extends State<SignUpPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: 30, // Row의 높이를 30으로 고정
+                  height: 30,
                   child: Row(
+                    //네비게이션 바
                     children: [
                       Expanded(
+                        //뒤로가기 버튼
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: CupertinoButton(
@@ -140,12 +274,23 @@ class _SignUpScreenState extends State<SignUpPage> {
                   color: Color.fromRGBO(200, 200, 200, 0.6),
                 ),
                 const SizedBox(height: 20),
-
-                // 재사용 가능한 input row 함수 사용
                 buildInputRow(
                   labelText: '이메일',
                   placeholder: '이메일',
                   controller: emailController,
+                  suffix: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    onPressed: () {
+                      sendVerificationLink();
+                    },
+                    child: const Text(
+                      '인증',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
@@ -162,8 +307,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   controller: confirmPasswordController,
                 ),
                 const SizedBox(height: 10),
-
-                // 비밀번호가 일치하지 않으면 경고 메시지 표시
                 if (!passwordsMatch)
                   const Text(
                     '비밀번호가 같지 않습니다',
@@ -172,18 +315,30 @@ class _SignUpScreenState extends State<SignUpPage> {
                       fontSize: 12,
                     ),
                   ),
-
                 const SizedBox(height: 10),
                 buildInputRow(
                   labelText: '닉네임',
                   placeholder: '닉네임',
                   controller: nicknameController,
+                  suffix: CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    onPressed: () {
+                      checkNicknameAvailability(); // 중복확인 기능 실행
+                    },
+                    child: const Text(
+                      '중복확인',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
                   labelText: '주소',
                   placeholder: '주소',
-                  controller: addressController, // 주소 필드 추가
+                  controller: addressController,
                 ),
                 const SizedBox(height: 20),
                 buildInputRow(
@@ -193,8 +348,6 @@ class _SignUpScreenState extends State<SignUpPage> {
                   controller: phoneNumberController,
                 ),
                 const SizedBox(height: 20),
-
-                // 약관 동의 스위치
                 Row(
                   children: [
                     const SizedBox(width: 20),
@@ -219,21 +372,57 @@ class _SignUpScreenState extends State<SignUpPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // 회원가입 버튼
                 CupertinoButton.filled(
                   child: const Text('회원가입'),
                   onPressed: agreeToTerms && passwordsMatch && allFieldsFilled
                       ? () {
-                          // 회원가입 처리
+                          handleSignUp();
                         }
-                      : null, // 약관 동의 및 필드가 비어있거나 비밀번호 일치하지 않으면 버튼 비활성화
+                      : null,
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+//이건 그냥 디자인용 함수
+  Widget buildInputRow({
+    required String labelText,
+    required String placeholder,
+    bool isPassword = false,
+    TextEditingController? controller,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffix,
+  }) {
+    return Row(
+      children: [
+        const SizedBox(width: 20),
+        SizedBox(
+          width: 120,
+          child: Text(
+            labelText,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: CupertinoTextField(
+            controller: controller,
+            placeholder: placeholder,
+            obscureText: isPassword,
+            keyboardType: keyboardType,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+            onChanged: (value) {
+              checkFields();
+            },
+            suffix: suffix,
+          ),
+        ),
+        const SizedBox(width: 20),
+      ],
     );
   }
 }

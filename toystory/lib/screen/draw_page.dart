@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
 import 'package:toystory/widget/confirm_3d_dialog.dart';
-import 'package:toystory/widget/reusable_dialog.dart';
 
 class DrawPage extends StatefulWidget {
   const DrawPage({super.key, required this.title});
@@ -60,7 +59,7 @@ class _DrawPageState extends State<DrawPage> {
                   _buildPointerModeSwitcher(context),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -198,7 +197,27 @@ class _DrawPageState extends State<DrawPage> {
         _buildColorButton(context, color: CupertinoColors.systemGreen),
         _buildColorButton(context, color: CupertinoColors.systemBlue),
         _buildColorButton(context, color: CupertinoColors.systemYellow),
+        _buildColorButton(context, color: CupertinoColors.systemPink), // 추가된 색상
+        _buildColorButton(context,
+            color: CupertinoColors.systemPurple), // 추가된 색상
+        _buildColorButton(context, color: CupertinoColors.systemTeal), // 추가된 색상
+        _buildColorButton(context,
+            color: CupertinoColors.systemOrange), // 추가된 색상
+        _buildEraserButton(context), // Add Eraser Button
       ],
+    );
+  }
+
+  Widget _buildEraserButton(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: notifier.select((value) => value is Erasing),
+      builder: (context, isErasing, child) => ColorButton(
+        color: Colors.transparent, // Transparent to indicate eraser
+        outlineColor: Colors.black,
+        isActive: isErasing,
+        onPressed: () => notifier.setEraser(), // Switch to eraser mode
+        child: const Icon(Icons.cleaning_services), // Eraser icon
+      ),
     );
   }
 
@@ -232,12 +251,12 @@ class _DrawPageState extends State<DrawPage> {
     return ValueListenableBuilder(
       valueListenable: notifier.select(
           (value) => value is Drawing && value.selectedColor == color.value),
-      builder: (context, value, child) => Padding(
+      builder: (context, isSelected, child) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: ColorButton(
           color: color,
-          isActive: value,
-          onPressed: () => notifier.setColor(color),
+          isActive: isSelected,
+          onPressed: () => notifier.setColor(color), // Set the drawing color
         ),
       ),
     );
