@@ -12,12 +12,14 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    // 5초 후에 다음 페이지로 이동
-    Future.delayed(const Duration(seconds: 5), () {
+
+    // 6.7초 후에 다음 페이지로 이동
+    Future.delayed(const Duration(seconds: 6, milliseconds: 700), () {
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-            builder: (context) => const LoginPage()), // 다음 페이지로 이동
+          builder: (context) => const LoginPage(), // 다음 페이지로 이동
+        ),
       );
     });
   }
@@ -25,25 +27,12 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.white, // 배경 색상을 하얀색으로 설정
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
-          children: const [
-            Text(
-              'ToyStory',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.black,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            SizedBox(height: 20), // 글씨와 로딩 아이콘 사이 간격
-            CupertinoActivityIndicator(
-              radius: 15, // 로딩 아이콘 크기 조절
-            ),
-          ],
+        child: Image.asset(
+          'assets/img/design/toystory_loading.gif', // GIF 파일 경로
+          fit: BoxFit.cover, // 이미지가 화면 전체를 채우도록 설정
+          width: double.infinity, // 너비를 화면 전체로 설정
+          height: double.infinity, // 높이를 화면 전체로 설정
         ),
       ),
     );
