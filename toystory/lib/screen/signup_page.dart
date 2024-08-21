@@ -78,6 +78,11 @@ class _SignUpScreenState extends State<SignUpPage> {
       return;
     }
 
+    if (nickname.length >= 9) {
+      showErrorDialog('닉네임이 너무 깁니다.');
+      return;
+    }
+
     try {
       await _apiService.checkNicknameAvailability(nickname);
       setState(() {

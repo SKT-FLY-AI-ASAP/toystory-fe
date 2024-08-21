@@ -12,7 +12,11 @@ class SettingsButton extends StatelessWidget {
       onPressed: () {
         _showSettingsDialog(context);
       },
-      child: Icon(CupertinoIcons.settings),
+      child: Icon(
+        CupertinoIcons.settings,
+        color: const Color.fromARGB(255, 54, 23, 206),
+        size: 22.0,
+      ),
     );
   }
 
