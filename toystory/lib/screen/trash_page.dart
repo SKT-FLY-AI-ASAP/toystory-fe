@@ -1,5 +1,47 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/settings_button.dart';
+import 'draw_page.dart';
+
+class Painting {
+  final int paintingId;
+  final int userId;
+  final String paintingTitle;
+  final String paintingUrl;
+  final bool isRemoved;
+
+  Painting({
+    required this.paintingId,
+    required this.userId,
+    required this.paintingTitle,
+    required this.paintingUrl,
+    required this.isRemoved,
+  });
+}
+
+List<Painting> samplePaintings = [
+  Painting(
+    paintingId: 1,
+    userId: 101,
+    paintingTitle: 'Sunset',
+    paintingUrl: 'assets/img/2d/image_1.png',
+    isRemoved: false,
+  ),
+  Painting(
+    paintingId: 2,
+    userId: 102,
+    paintingTitle: 'Ocean View',
+    paintingUrl: 'assets/img/2d/image_2.png',
+    isRemoved: false,
+  ),
+  Painting(
+    paintingId: 3,
+    userId: 103,
+    paintingTitle: 'Mountain',
+    paintingUrl: 'assets/img/2d/image_3.png',
+    isRemoved: false,
+  ),
+  // 추가적인 샘플 아이템...
+];
 
 class TrashPage extends StatelessWidget {
   const TrashPage({Key? key}) : super(key: key);
@@ -10,7 +52,22 @@ class TrashPage extends StatelessWidget {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('휴지통'),
+        backgroundColor: const Color.fromARGB(18, 54, 23, 206), // 배경색 변경
+        border: Border(
+          bottom: BorderSide(
+            color: CupertinoColors.white, // 하단 경계선 색상 변경
+            width: 0.0, // 경계선 두께 조정 (없애기 위해 0 설정)
+          ),
+        ),
+        middle: Text(
+          '주문외우기',
+          style: TextStyle(
+            //fontFamily: 'crayon',
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: const Color.fromARGB(255, 54, 23, 206), // 텍스트 색상 변경
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -19,57 +76,121 @@ class TrashPage extends StatelessWidget {
               onPressed: () {
                 print('휴지통 페이지의 휴지통 버튼 눌림');
               },
-              child: Icon(CupertinoIcons.trash),
+              child: Icon(
+                CupertinoIcons.trash,
+                color: const Color.fromARGB(255, 54, 23, 206), // 아이콘 색상 변경
+                size: 22.0,
+              ),
             ),
             const SizedBox(width: 8),
             SettingsButton(),
           ],
         ),
       ),
-      child: SafeArea(
-        child: GridView.count(
-          crossAxisCount: 5, // 한 행에 5개의 아이템을 배치
-          padding: const EdgeInsets.all(16.0),
-          crossAxisSpacing: 16.0, // 아이템 사이의 가로 간격
-          mainAxisSpacing: 16.0, // 아이템 사이의 세로 간격
-          children: List.generate(3, (index) {
-            return Column(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      print('휴지통 아이템 $index 클릭됨');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: screenWidth / 6,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          'assets/img/trash/image_$index.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+      child: Column(
+        children: [
+          const SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
+          Expanded(
+            child: Container(
+              color: CupertinoColors.systemGrey5, // SafeArea의 배경색 변경
+              child: SafeArea(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16.0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5, // 한 행에 5개의 아이템을 배치
+                    crossAxisSpacing: 16.0, // 아이템 사이의 가로 간격
+                    mainAxisSpacing: 16.0, // 아이템 사이의 세로 간격
                   ),
+                  itemCount: samplePaintings.length + 1, // +1은 새로 만들기 버튼
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      // 새로 만들기 버튼
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true).push(
+                                  CupertinoPageRoute(
+                                    fullscreenDialog: false,
+                                    builder: (context) => const DrawPage(
+                                      title: '새 주문 외우기',
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(80, 54, 23, 206),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                width: screenWidth / 6,
+                                child: const Center(
+                                  child: Icon(
+                                    CupertinoIcons.speaker_2,
+                                    color: CupertinoColors.white,
+                                    size: 40,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            '새로 만들기',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: CupertinoColors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      );
+                    } else {
+                      final painting = samplePaintings[index - 1];
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                print('휴지통 아이템 ${painting.paintingId} 클릭됨');
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: CupertinoColors.systemGrey,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                width: screenWidth / 6,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    painting.paintingUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8), // 아이템과 제목 사이의 간격
+                          Text(
+                            painting.paintingTitle,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: CupertinoColors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
-                const SizedBox(height: 8), // 아이템과 제목 사이의 간격
-                Text(
-                  '휴지통 아이템 $index 제목',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: CupertinoColors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            );
-          }),
-        ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
