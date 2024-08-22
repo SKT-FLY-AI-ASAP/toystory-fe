@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
 import 'package:toystory/widget/confirm_3d_dialog.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:toystory/services/api_service.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
 class DrawPage extends StatefulWidget {
-  const DrawPage({super.key, required this.title});
-
-  final String title;
+  const DrawPage({super.key});
 
   @override
   State<DrawPage> createState() => _DrawPageState();
@@ -15,6 +17,7 @@ class DrawPage extends StatefulWidget {
 
 class _DrawPageState extends State<DrawPage> {
   late ScribbleNotifier notifier;
+  final TextEditingController _titleController = TextEditingController();
 
   @override
   void initState() {
@@ -23,12 +26,25 @@ class _DrawPageState extends State<DrawPage> {
   }
 
   @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGrey6,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: const Color.fromARGB(18, 54, 23, 206),
-        middle: Text(widget.title),
+        middle: SizedBox(
+          width: 200,
+          child: CupertinoTextField(
+            controller: _titleController,
+            placeholder: "제목을 입력하세요",
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: _buildActions(context),
@@ -72,11 +88,10 @@ class _DrawPageState extends State<DrawPage> {
       CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () async {
-          // Show the confirm dialog on cube button press
           final result = await showCupertinoDialog<bool>(
             context: context,
             builder: (BuildContext context) {
-              return const Confirm3DTransformDialog(); // Your custom dialog
+              return const Confirm3DTransformDialog();
             },
           );
 
@@ -89,10 +104,10 @@ class _DrawPageState extends State<DrawPage> {
                   content: Column(
                     children: [
                       const Text('3D 변환 중입니다...'),
-                      const SizedBox(height: 16), // 간격 추가
+                      const SizedBox(height: 16),
                       Image.asset(
-                        'assets/img/loading/3D_loading.png', // 로컬 이미지 경로
-                        height: 150, // 이미지 크기
+                        'assets/img/loading/3D_loading.png',
+                        height: 150,
                         width: 150,
                       ),
                     ],
@@ -101,7 +116,7 @@ class _DrawPageState extends State<DrawPage> {
                     CupertinoDialogAction(
                       child: const Text('확인'),
                       onPressed: () {
-                        Navigator.of(context).pop(); // 확인 버튼 누를 시 다이얼로그 닫기
+                        Navigator.of(context).pop();
                       },
                     ),
                   ],
@@ -137,17 +152,61 @@ class _DrawPageState extends State<DrawPage> {
       CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () async {
-          // 여기에 저장 로직을 구현합니다.
-          // 예: Scribble 그림을 이미지로 저장하기
-          final image = await notifier.renderImage();
-          if (image != null) {
-            // 이미지를 파일로 저장하거나 서버로 업로드하는 로직을 구현할 수 있습니다.
-            print('그림이 성공적으로 렌더링되었습니다.');
+          final ByteData? imageData = await notifier.renderImage();
+
+          if (imageData != null) {
+            final Uint8List imageBytes = imageData.buffer.asUint8List();
+            final savedFile = await _saveImageToFile(imageBytes);
+            if (savedFile != null) {
+              try {
+                await ApiService().createSketchbook(
+                  title: _titleController.text,
+                  file: savedFile,
+                );
+
+                // 저장 성공 시 다이얼로그 표시
+                showCupertinoDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CupertinoAlertDialog(
+                      title: const Text('저장 성공'),
+                      content: const Text('스케치북이 성공적으로 생성되었습니다.'),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text('확인'),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 다이얼로그 닫기
+                            Navigator.of(context).pop(); // 뒤로 가기
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } catch (e) {
+                print(e);
+              }
+            }
           }
         },
         child: const Icon(CupertinoIcons.cloud_upload),
       ),
     ];
+  }
+
+  Future<File?> _saveImageToFile(Uint8List imageBytes) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/sketchbook.png';
+      final file = File(filePath);
+
+      await file.writeAsBytes(imageBytes);
+      print('이미지 파일로 저장됨: $filePath');
+      return file;
+    } catch (e) {
+      print('이미지 파일 저장 실패: $e');
+      return null;
+    }
   }
 
   Widget _buildStrokeToolbar(BuildContext context) {
@@ -212,13 +271,11 @@ class _DrawPageState extends State<DrawPage> {
         _buildColorButton(context, color: CupertinoColors.systemGreen),
         _buildColorButton(context, color: CupertinoColors.systemBlue),
         _buildColorButton(context, color: CupertinoColors.systemYellow),
-        _buildColorButton(context, color: CupertinoColors.systemPink), // 추가된 색상
-        _buildColorButton(context,
-            color: CupertinoColors.systemPurple), // 추가된 색상
-        _buildColorButton(context, color: CupertinoColors.systemTeal), // 추가된 색상
-        _buildColorButton(context,
-            color: CupertinoColors.systemOrange), // 추가된 색상
-        _buildEraserButton(context), // Add Eraser Button
+        _buildColorButton(context, color: CupertinoColors.systemPink),
+        _buildColorButton(context, color: CupertinoColors.systemPurple),
+        _buildColorButton(context, color: CupertinoColors.systemTeal),
+        _buildColorButton(context, color: CupertinoColors.systemOrange),
+        _buildEraserButton(context),
       ],
     );
   }
@@ -227,11 +284,11 @@ class _DrawPageState extends State<DrawPage> {
     return ValueListenableBuilder(
       valueListenable: notifier.select((value) => value is Erasing),
       builder: (context, isErasing, child) => ColorButton(
-        color: Colors.transparent, // Transparent to indicate eraser
+        color: Colors.transparent,
         outlineColor: Colors.black,
         isActive: isErasing,
-        onPressed: () => notifier.setEraser(), // Switch to eraser mode
-        child: const Icon(Icons.cleaning_services), // Eraser icon
+        onPressed: () => notifier.setEraser(),
+        child: const Icon(Icons.cleaning_services),
       ),
     );
   }
@@ -271,7 +328,7 @@ class _DrawPageState extends State<DrawPage> {
         child: ColorButton(
           color: color,
           isActive: isSelected,
-          onPressed: () => notifier.setColor(color), // Set the drawing color
+          onPressed: () => notifier.setColor(color),
         ),
       ),
     );
@@ -289,13 +346,9 @@ class ColorButton extends StatelessWidget {
   });
 
   final Color color;
-
   final Color? outlineColor;
-
   final bool isActive;
-
   final VoidCallback onPressed;
-
   final Icon? child;
 
   @override
