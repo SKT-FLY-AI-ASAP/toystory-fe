@@ -76,7 +76,7 @@ flutter:
     - assets/img/design/
     - assets/obj/
     - assets/glb/
-    - assets/logo/toystory_logo2.png
+    - assets/logo/toystory_logo.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   fonts:
