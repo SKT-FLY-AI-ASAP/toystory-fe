@@ -44,7 +44,8 @@ class _ThreeDPageState extends State<ThreeDPage> {
   // AWS API에서 데이터를 가져오는 함수
   Future<void> fetchThreeDItems() async {
     try {
-      final response = await ApiService().fetchThreeDItems(); // AWS API에서 데이터 가져오기
+      final response =
+          await ApiService().fetchThreeDItems(); // AWS API에서 데이터 가져오기
       setState(() {
         // 응답 데이터를 리스트로 변환
         threeDItems = (response['data'] as List)
@@ -101,7 +102,8 @@ class _ThreeDPageState extends State<ThreeDPage> {
           const SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
           Expanded(
             child: Container(
-              color: CupertinoColors.extraLightBackgroundGray, // SafeArea의 배경색 변경
+              color:
+                  CupertinoColors.extraLightBackgroundGray, // SafeArea의 배경색 변경
               child: SafeArea(
                 child: GridView.count(
                   crossAxisCount: 5, // 한 행에 5개의 아이템을 배치
@@ -116,11 +118,13 @@ class _ThreeDPageState extends State<ThreeDPage> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
+                              // content_id를 My3DModel에 전달하여 3D 뷰어로 이동
                               Navigator.push(
                                 context,
                                 CupertinoPageRoute(
-                                  builder: (context) =>
-                                      My3DModel(), // 3D 모델 뷰어로 이동
+                                  builder: (context) => My3DModel(
+                                    contentId: item.contentId, // contentId 전달
+                                  ),
                                 ),
                               );
                               print('${item.contentTitle} 클릭됨');
