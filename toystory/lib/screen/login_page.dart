@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 180,
                       child: Center(
                         child: Image.asset(
-                          'assets/logo/toystory_logo2.png', // 로고 이미지 경로
+                          'assets/logo/toystory_logo.png', // 로고 이미지 경로
                           height: 180, // 이미지 크기 조정
                         ),
                       ),

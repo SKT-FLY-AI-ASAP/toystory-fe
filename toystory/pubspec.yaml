@@ -45,6 +45,7 @@ dependencies:
   three_dart: ^0.0.16
   webview_flutter: ^4.9.0
   path_provider: ^2.1.4
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +76,6 @@ flutter:
     - assets/img/trash/
     - assets/img/loading/
     - assets/img/design/
-    - assets/obj/
     - assets/glb/
     - assets/logo/toystory_logo.png
   #   - images/a_dot_burr.jpeg
