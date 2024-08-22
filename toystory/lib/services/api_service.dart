@@ -234,4 +234,35 @@ class ApiService {
       throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
+
+// 3D 아이템 조회
+
+    Future<dynamic> fetchThreeDItems() async {
+    try {
+      String? accessToken = await TokenStorage.getToken(); // Assuming this fetches the token asynchronously
+      final response = await _dio.get(
+        '/doc/3d/list', // Replace with your actual API endpoint for 3D items
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print(responseData);
+
+        // 응답 데이터를 반환
+        return responseData;
+      } else {
+        throw Exception('3D 아이템 리스트 조회에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
 }
+
+
