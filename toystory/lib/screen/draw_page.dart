@@ -133,6 +133,20 @@ class _DrawPageState extends State<DrawPage> {
         onPressed: notifier.clear,
         child: const Icon(CupertinoIcons.clear),
       ),
+      // 저장 버튼 추가
+      CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () async {
+          // 여기에 저장 로직을 구현합니다.
+          // 예: Scribble 그림을 이미지로 저장하기
+          final image = await notifier.renderImage();
+          if (image != null) {
+            // 이미지를 파일로 저장하거나 서버로 업로드하는 로직을 구현할 수 있습니다.
+            print('그림이 성공적으로 렌더링되었습니다.');
+          }
+        },
+        child: const Icon(CupertinoIcons.cloud_upload),
+      ),
     ];
   }
 
