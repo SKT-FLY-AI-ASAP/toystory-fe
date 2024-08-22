@@ -31,7 +31,7 @@ class _My3DModelState extends State<My3DModel> {
           await ApiService().fetch3DItemDetails(contentId: widget.contentId);
       setState(() {
         modelUrl = response['content_url']; // 모델의 GLB URL
-        stlUrl = response['stl_url']; // STL 파일의 다운로드 URL
+        stlUrl = response['design_url']; // STL 파일의 다운로드 URL
         contentTitle = response['content_title']; // 모델의 제목
       });
     } catch (e) {
