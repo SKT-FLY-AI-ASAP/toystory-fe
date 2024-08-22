@@ -28,14 +28,14 @@ class RootPage extends StatelessWidget {
               CupertinoIcons.cube,
               size: 25.0,
             ),
-            label: '장난감사진',
+            label: '장난감 상자',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               CupertinoIcons.speaker_2,
               size: 25.0,
             ),
-            label: '주문외우기',
+            label: '주문 외우기',
           ),
         ],
       ),

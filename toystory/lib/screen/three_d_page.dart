@@ -101,12 +101,12 @@ class ThreeDPage extends StatelessWidget {
           ),
         ),
         middle: Text(
-          '장난감상자',
+          '장난감 상자',
           style: TextStyle(
             //fontFamily: 'crayon',
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 54, 23, 206), // 텍스트 색상 변경
+            color: CupertinoColors.systemGrey, // 텍스트 색상 변경
           ),
         ),
         trailing: Row(

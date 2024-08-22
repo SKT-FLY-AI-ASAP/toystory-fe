@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/settings_button.dart';
-import 'draw_page.dart';
+import 'package:toystory/widget/magic_dialog.dart';
 
 class Painting {
   final int paintingId;
@@ -60,12 +60,11 @@ class TrashPage extends StatelessWidget {
           ),
         ),
         middle: Text(
-          '주문외우기',
+          '주문 외우기',
           style: TextStyle(
-            //fontFamily: 'crayon',
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 54, 23, 206), // 텍스트 색상 변경
+            color: CupertinoColors.systemGrey, // 텍스트 색상 변경
           ),
         ),
         trailing: Row(
@@ -89,7 +88,7 @@ class TrashPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
+          SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
           Expanded(
             child: Container(
               color: CupertinoColors.systemGrey5, // SafeArea의 배경색 변경
@@ -104,39 +103,32 @@ class TrashPage extends StatelessWidget {
                   itemCount: samplePaintings.length + 1, // +1은 새로 만들기 버튼
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      // 새로 만들기 버튼
+                      // magic_dialog.dart 파일에 정의된 showMagicDialog 함수 호출
                       return Column(
                         children: [
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context, rootNavigator: true).push(
-                                  CupertinoPageRoute(
-                                    fullscreenDialog: false,
-                                    builder: (context) => const DrawPage(
-                                      title: '새 주문 외우기',
-                                    ),
-                                  ),
-                                );
+                                showMagicDialog(context);
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: const Color.fromARGB(80, 54, 23, 206),
+                                  color: CupertinoColors.systemGrey,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 width: screenWidth / 6,
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
-                                    CupertinoIcons.speaker_2,
-                                    color: CupertinoColors.white,
+                                    CupertinoIcons.star,
                                     size: 40,
+                                    color: CupertinoColors.white,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             '새로 만들기',
                             style: TextStyle(
                               fontSize: 14,
@@ -161,7 +153,6 @@ class TrashPage extends StatelessWidget {
                                   color: CupertinoColors.systemGrey,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                width: screenWidth / 6,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.asset(
@@ -175,7 +166,7 @@ class TrashPage extends StatelessWidget {
                           const SizedBox(height: 8), // 아이템과 제목 사이의 간격
                           Text(
                             painting.paintingTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: CupertinoColors.black,
