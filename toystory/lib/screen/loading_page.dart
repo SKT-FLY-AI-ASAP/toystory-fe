@@ -30,9 +30,8 @@ class _LoadingPageState extends State<LoadingPage> {
       child: Center(
         child: Image.asset(
           'assets/img/design/toystory_loading.gif', // GIF 파일 경로
-          fit: BoxFit.cover, // 이미지가 화면 전체를 채우도록 설정
-          width: double.infinity, // 너비를 화면 전체로 설정
-          height: double.infinity, // 높이를 화면 전체로 설정
+          fit: BoxFit.contain, // 이미지 비율 유지, 가능한 최대 크기로
+          width: 1500, // 고정된 너비 설정 (예: 300)
         ),
       ),
     );

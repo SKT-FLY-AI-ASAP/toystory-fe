@@ -3,6 +3,8 @@ import 'package:toystory/widget/edit_profile_dialog.dart';
 import 'package:toystory/widget/production_dialog.dart';
 import 'package:toystory/widget/delivery_dialog.dart';
 import 'package:toystory/widget/terms_dialog.dart';
+import 'package:toystory/services/api_service.dart';
+import 'package:toystory/screen/login_page.dart'; // 로그인 페이지 import
 
 class SettingsButton extends StatelessWidget {
   @override
@@ -85,8 +87,20 @@ class SettingsButton extends StatelessWidget {
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
             isDestructiveAction: true,
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              try {
+                // 로그아웃 API 호출
+                await ApiService().logout();
+
+                // 로그아웃 성공 시 LoginPage로 이동
+                Navigator.of(context).pushAndRemoveUntil(
+                  CupertinoPageRoute(builder: (context) => const LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
+              } catch (e) {
+                print('로그아웃 실패: $e');
+                // 로그아웃 실패 시 에러 처리 로직 추가 가능
+              }
             },
             child: const Text('로그아웃'),
           ),

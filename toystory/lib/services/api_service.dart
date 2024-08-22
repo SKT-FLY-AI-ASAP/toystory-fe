@@ -295,12 +295,11 @@ class ApiService {
     }
   }
 
-
-
   // 주문외우기 조회
   Future<dynamic> fetchMagicItems() async {
     try {
-      String? accessToken = await TokenStorage.getToken(); // Assuming this fetches the token asynchronously
+      String? accessToken = await TokenStorage
+          .getToken(); // Assuming this fetches the token asynchronously
       final response = await _dio.get(
         '/doc/stt/list', // Replace with your actual API endpoint for 3D items
         options: Options(
@@ -318,6 +317,35 @@ class ApiService {
         return responseData;
       } else {
         throw Exception('3D 아이템 리스트 조회에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  // 로그아웃 함수
+  Future<void> logout() async {
+    try {
+      String? accessToken = await TokenStorage.getToken(); // 토큰을 비동기로 가져옴
+      final response = await _dio.delete(
+        '/user/session', // 로그아웃 API 엔드포인트
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('로그아웃 성공');
+
+        // 로그아웃 성공 시 저장된 토큰 삭제
+        TokenStorage.clearToken(); // 토큰 삭제
+
+        // 추가적으로 로그아웃 후 처리할 로직이 있다면 여기에 작성하세요.
+      } else {
+        throw Exception('로그아웃에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
       print(e);
