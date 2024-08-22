@@ -27,6 +27,7 @@ class _DrawPageState extends State<DrawPage> {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGrey6,
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: const Color.fromARGB(18, 54, 23, 206),
         middle: Text(widget.title),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

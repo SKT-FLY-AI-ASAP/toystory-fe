@@ -76,172 +76,162 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.white,
-      child: Center(
-        child: Container(
-          width: 540,
-          height: 580,
-          padding: const EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            color: CupertinoColors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
+      // 배경 이미지를 추가하는 부분
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 배경 이미지
+          // Image.asset(
+          //   'assets/img/design/toystroy_bg2.jpg', // 배경 이미지 경로
+          //   fit: BoxFit.cover, // 이미지를 전체 화면에 맞춤
+          // ),
+          // Foreground content
+          Center(
+            child: Container(
+              width: 540,
+              height: 580,
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: CupertinoColors.white.withOpacity(0.8), // 반투명 배경색
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  height: 30,
-                  child: Center(
-                    child: Text(
-                      '로그인',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Divider(
-                  thickness: 1.0,
-                  color: Color.fromRGBO(200, 200, 200, 0.6),
-                ),
-                const SizedBox(height: 30),
-                const Text(
-                  'ToyStory',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.black,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                const SizedBox(height: 50),
-
-                // Row with Text and TextField for E-mail
-                Row(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(width: 20),
-                    const SizedBox(
-                      width: 80, // 고정된 너비
-                      child: Text(
-                        '아이디',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: CupertinoColors.black,
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 180,
+                      child: Center(
+                        child: Image.asset(
+                          'assets/logo/toystory_logo2.png', // 로고 이미지 경로
+                          height: 180, // 이미지 크기 조정
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10), // 간격
-                    Expanded(
-                      child: CupertinoTextField(
-                        controller: _emailController,
-                        placeholder: 'E-mail',
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 10),
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Row with Text and TextField for PW
-                Row(
-                  children: [
-                    SizedBox(width: 20),
-                    const SizedBox(
-                      width: 80, // 고정된 너비
-                      child: Text(
-                        '비밀번호',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: CupertinoColors.black,
+                    const SizedBox(height: 20),
+                    // 이메일 입력 필드
+                    Row(
+                      children: [
+                        SizedBox(width: 20),
+                        const SizedBox(
+                          width: 80, // 고정된 너비
+                          child: Text(
+                            '이메일',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: CupertinoColors.black,
+                            ),
+                          ),
                         ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CupertinoTextField(
+                            controller: _emailController,
+                            placeholder: 'E-mail',
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 10),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // 비밀번호 입력 필드
+                    Row(
+                      children: [
+                        SizedBox(width: 20),
+                        const SizedBox(
+                          width: 80, // 고정된 너비
+                          child: Text(
+                            '비밀번호',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: CupertinoColors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CupertinoTextField(
+                            controller: _passwordController,
+                            placeholder: 'PW',
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 10),
+                            obscureText: true,
+                            onSubmitted: (_) => handleLogin(),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                    // 로그인 버튼
+                    Container(
+                      width: 300,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 54, 23, 206),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: CupertinoButton(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: const Text(
+                          '로그인',
+                          style: TextStyle(
+                            color: CupertinoColors.white,
+                          ),
+                        ),
+                        onPressed: handleLogin,
                       ),
                     ),
-                    const SizedBox(width: 10), // 간격
-                    Expanded(
-                      child: CupertinoTextField(
-                        controller: _passwordController,
-                        placeholder: 'PW',
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 10),
-                        obscureText: true,
-                        onSubmitted: (_) =>
-                            handleLogin(), // Trigger login on Enter key press
+                    const SizedBox(height: 10),
+                    // 회원가입 버튼
+                    CupertinoButton(
+                      child: const Text(
+                        '회원가입',
+                        style: TextStyle(color: CupertinoColors.black),
                       ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const SignUpPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin = 0.0;
+                              const end = 1.0;
+                              const curve = Curves.ease;
+
+                              final tween = Tween(begin: begin, end: end);
+                              final curvedAnimation = CurvedAnimation(
+                                parent: animation,
+                                curve: curve,
+                              );
+
+                              return FadeTransition(
+                                opacity: tween.animate(curvedAnimation),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(width: 20),
                   ],
                 ),
-                const SizedBox(height: 40),
-
-                Container(
-                  width: 300, // 버튼의 너비 설정
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBlue, // 배경 색상
-                    borderRadius: BorderRadius.circular(30), // 모서리를 둥글게
-                  ),
-                  child: CupertinoButton(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0), // 패딩을 통해 높이 조정
-                    child: const Text(
-                      '로그인',
-                      style: TextStyle(
-                        color: CupertinoColors.white, // 텍스트 색상
-                      ),
-                    ),
-                    onPressed: handleLogin,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CupertinoButton(
-                  child: const Text(
-                    '회원가입',
-                    style: TextStyle(color: CupertinoColors.black),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            const SignUpPage(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin = 0.0;
-                          const end = 1.0;
-                          const curve = Curves.ease;
-
-                          final tween = Tween(begin: begin, end: end);
-                          final curvedAnimation = CurvedAnimation(
-                            parent: animation,
-                            curve: curve,
-                          );
-
-                          return FadeTransition(
-                            opacity: tween.animate(curvedAnimation),
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

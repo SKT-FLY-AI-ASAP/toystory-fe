@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/settings_button.dart';
 import 'package:toystory/widget/magic_dialog.dart';
-import 'draw_page.dart';
 
 class Painting {
   final int paintingId;
@@ -61,11 +60,11 @@ class TrashPage extends StatelessWidget {
           ),
         ),
         middle: Text(
-          '주문외우기',
+          '주문 외우기',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 54, 23, 206), // 텍스트 색상 변경
+            color: CupertinoColors.systemGrey, // 텍스트 색상 변경
           ),
         ),
         trailing: Row(
@@ -105,40 +104,41 @@ class TrashPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       // magic_dialog.dart 파일에 정의된 showMagicDialog 함수 호출
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              showMagicDialog(context);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: CupertinoColors.systemGrey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  CupertinoIcons.add,
-                                  size: 40,
-                                  color: CupertinoColors.black,
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                showMagicDialog(context);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: CupertinoColors.systemGrey,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                width: screenWidth / 6,
+                                child: Center(
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: 40,
+                                    color: CupertinoColors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '새로 만들기',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: CupertinoColors.black,
+                          const SizedBox(height: 8),
+                          Text(
+                            '새로 만들기',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: CupertinoColors.black,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    );
+                        ],
+                      );
                     } else {
                       final painting = samplePaintings[index - 1];
                       return Column(
@@ -186,5 +186,3 @@ class TrashPage extends StatelessWidget {
     );
   }
 }
-
-

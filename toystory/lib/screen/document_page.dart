@@ -82,7 +82,7 @@ class DocumentPage extends StatelessWidget {
             //fontFamily: 'crayon',
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 54, 23, 206), // 텍스트 색상 변경
+            color: CupertinoColors.systemGrey, // 텍스트 색상 변경
           ),
         ),
         trailing: Row(
