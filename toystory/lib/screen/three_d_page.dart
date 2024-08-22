@@ -1,91 +1,60 @@
 import 'package:flutter/cupertino.dart';
-import 'package:toystory/widget/settings_button.dart';
 import 'glb_viewer_page.dart';
+import 'package:toystory/widget/settings_button.dart';
+import 'package:toystory/services/api_service.dart'; // API Service를 위한 임포트
 
 class ThreeDItem {
   final int contentId;
   final String contentTitle;
-  final int userId;
   final String contentUrl;
-  final bool isRemoved;
 
   ThreeDItem({
     required this.contentId,
     required this.contentTitle,
-    required this.userId,
     required this.contentUrl,
-    required this.isRemoved,
   });
+
+  // JSON 데이터를 ThreeDItem 객체로 변환하는 팩토리 메서드
+  factory ThreeDItem.fromJson(Map<String, dynamic> json) {
+    return ThreeDItem(
+      contentId: json['content_id'],
+      contentTitle: json['content_title'],
+      contentUrl: json['content_url'],
+    );
+  }
 }
 
-List<ThreeDItem> sampleThreeDItems = [
-  ThreeDItem(
-    contentId: 1,
-    contentTitle: '빙봉',
-    userId: 101,
-    contentUrl: 'assets/img/3d/image_1.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 2,
-    contentTitle: '비행기',
-    userId: 102,
-    contentUrl: 'assets/img/3d/image_2.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 3,
-    contentTitle: '전설의 동물',
-    userId: 103,
-    contentUrl: 'assets/img/3d/image_3.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 4,
-    contentTitle: '곰돌이',
-    userId: 104,
-    contentUrl: 'assets/img/3d/image_4.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 1,
-    contentTitle: '엑스칼리버',
-    userId: 101,
-    contentUrl: 'assets/img/3d/image_5.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 2,
-    contentTitle: '라이언킹',
-    userId: 102,
-    contentUrl: 'assets/img/3d/image_6.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 3,
-    contentTitle: '거북이',
-    userId: 103,
-    contentUrl: 'assets/img/3d/image_7.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 4,
-    contentTitle: '사자',
-    userId: 104,
-    contentUrl: 'assets/img/3d/image_8.webp',
-    isRemoved: false,
-  ),
-  ThreeDItem(
-    contentId: 4,
-    contentTitle: '칼',
-    userId: 104,
-    contentUrl: 'assets/img/3d/image_9.webp',
-    isRemoved: false,
-  ),
-];
-
-class ThreeDPage extends StatelessWidget {
+class ThreeDPage extends StatefulWidget {
   const ThreeDPage({Key? key}) : super(key: key);
+
+  @override
+  _ThreeDPageState createState() => _ThreeDPageState();
+}
+
+class _ThreeDPageState extends State<ThreeDPage> {
+  List<ThreeDItem> threeDItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // 페이지가 로드될 때 API 호출
+    fetchThreeDItems();
+  }
+
+  // AWS API에서 데이터를 가져오는 함수
+  Future<void> fetchThreeDItems() async {
+    try {
+      final response = await ApiService().fetchThreeDItems(); // AWS API에서 데이터 가져오기
+      setState(() {
+        // 응답 데이터를 리스트로 변환
+        threeDItems = (response['data'] as List)
+            .map<ThreeDItem>((json) => ThreeDItem.fromJson(json))
+            .toList();
+      });
+    } catch (e) {
+      print(e); // 에러 처리
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +72,6 @@ class ThreeDPage extends StatelessWidget {
         middle: Text(
           '장난감 상자',
           style: TextStyle(
-            //fontFamily: 'crayon',
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: CupertinoColors.systemGrey, // 텍스트 색상 변경
@@ -133,16 +101,15 @@ class ThreeDPage extends StatelessWidget {
           const SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
           Expanded(
             child: Container(
-              color:
-                  CupertinoColors.extraLightBackgroundGray, // SafeArea의 배경색 변경
+              color: CupertinoColors.extraLightBackgroundGray, // SafeArea의 배경색 변경
               child: SafeArea(
                 child: GridView.count(
                   crossAxisCount: 5, // 한 행에 5개의 아이템을 배치
                   padding: const EdgeInsets.all(16.0),
                   crossAxisSpacing: 16.0, // 아이템 사이의 가로 간격
                   mainAxisSpacing: 16.0, // 아이템 사이의 세로 간격
-                  children: List.generate(sampleThreeDItems.length, (index) {
-                    final item = sampleThreeDItems[index]; // 샘플 데이터에서 아이템 가져오기
+                  children: List.generate(threeDItems.length, (index) {
+                    final item = threeDItems[index]; // API에서 가져온 3D 아이템 데이터
 
                     return Column(
                       children: [
@@ -166,7 +133,7 @@ class ThreeDPage extends StatelessWidget {
                               width: screenWidth / 6,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
+                                child: Image.network(
                                   item.contentUrl,
                                   fit: BoxFit.cover,
                                 ),
