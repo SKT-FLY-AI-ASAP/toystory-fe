@@ -85,48 +85,48 @@ class _DrawPageState extends State<DrawPage> {
 
   List<Widget> _buildActions(BuildContext context) {
     return [
-      CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: () async {
-          final result = await showCupertinoDialog<bool>(
-            context: context,
-            builder: (BuildContext context) {
-              return const Confirm3DTransformDialog();
-            },
-          );
+      // CupertinoButton(
+      //   padding: EdgeInsets.zero,
+      //   onPressed: () async {
+      //     final result = await showCupertinoDialog<bool>(
+      //       context: context,
+      //       builder: (BuildContext context) {
+      //         return const Confirm3DTransformDialog();
+      //       },
+      //     );
 
-          if (result == true) {
-            showCupertinoDialog(
-              context: context,
-              builder: (context) {
-                return CupertinoAlertDialog(
-                  title: const Text('3D 변환중'),
-                  content: Column(
-                    children: [
-                      const Text('3D 변환 중입니다...'),
-                      const SizedBox(height: 16),
-                      Image.asset(
-                        'assets/img/loading/3D_loading.png',
-                        height: 150,
-                        width: 150,
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    CupertinoDialogAction(
-                      child: const Text('확인'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-        },
-        child: const Icon(CupertinoIcons.cube),
-      ),
+      //     if (result == true) {
+      //       showCupertinoDialog(
+      //         context: context,
+      //         builder: (context) {
+      //           return CupertinoAlertDialog(
+      //             title: const Text('3D 변환중'),
+      //             content: Column(
+      //               children: [
+      //                 const Text('3D 변환 중입니다...'),
+      //                 const SizedBox(height: 16),
+      //                 Image.asset(
+      //                   'assets/img/loading/3D_loading.png',
+      //                   height: 150,
+      //                   width: 150,
+      //                 ),
+      //               ],
+      //             ),
+      //             actions: [
+      //               CupertinoDialogAction(
+      //                 child: const Text('확인'),
+      //                 onPressed: () {
+      //                   Navigator.of(context).pop();
+      //                 },
+      //               ),
+      //             ],
+      //           );
+      //         },
+      //       );
+      //     }
+      //   },
+      //   child: const Icon(CupertinoIcons.cube),
+      // ),
       ValueListenableBuilder(
         valueListenable: notifier,
         builder: (context, value, child) => CupertinoButton(

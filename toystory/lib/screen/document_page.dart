@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'draw_page.dart';
 import 'package:toystory/widget/settings_button.dart';
 import 'package:toystory/services/api_service.dart';
+import 'package:toystory/screen/sketch_viewer_page.dart'; // SketchViewer import
 
 class Painting {
   final int paintingId;
@@ -151,17 +152,31 @@ class _DocumentPageState extends State<DocumentPage> {
                       return Column(
                         children: [
                           Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: CupertinoColors.systemGrey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              width: screenWidth / 6,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  painting.paintingUrl,
-                                  fit: BoxFit.cover,
+                            child: GestureDetector(
+                              onTap: () {
+                                // 해당 그림 클릭 시 SketchViewer 페이지로 이동
+                                Navigator.of(context, rootNavigator: true).push(
+                                  CupertinoPageRoute(
+                                    builder: (context) => SketchViewer(
+                                      title: painting.paintingTitle,
+                                      imageUrl: painting.paintingUrl,
+                                      imageId: painting.paintingId,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: CupertinoColors.systemGrey,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                width: screenWidth / 6,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    painting.paintingUrl,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
