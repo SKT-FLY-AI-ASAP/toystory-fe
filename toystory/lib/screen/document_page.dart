@@ -1,70 +1,60 @@
 import 'package:flutter/cupertino.dart';
 import 'draw_page.dart';
 import 'package:toystory/widget/settings_button.dart';
+import 'package:toystory/services/api_service.dart';
 
 class Painting {
   final int paintingId;
-  final int userId;
   final String paintingTitle;
   final String paintingUrl;
-  final bool isRemoved;
 
   Painting({
     required this.paintingId,
-    required this.userId,
     required this.paintingTitle,
     required this.paintingUrl,
-    required this.isRemoved,
   });
 }
 
-List<Painting> samplePaintings = [
-  Painting(
-    paintingId: 1,
-    userId: 101,
-    paintingTitle: '곰돌이',
-    paintingUrl: 'assets/img/2d/image_1.png',
-    isRemoved: false,
-  ),
-  Painting(
-    paintingId: 2,
-    userId: 102,
-    paintingTitle: '엑스칼리버',
-    paintingUrl: 'assets/img/2d/image_2.png',
-    isRemoved: false,
-  ),
-  Painting(
-    paintingId: 3,
-    userId: 103,
-    paintingTitle: '기차',
-    paintingUrl: 'assets/img/2d/image_3.png',
-    isRemoved: false,
-  ),
-  Painting(
-    paintingId: 3,
-    userId: 103,
-    paintingTitle: '트럭',
-    paintingUrl: 'assets/img/2d/image_4.png',
-    isRemoved: false,
-  ),
-  Painting(
-    paintingId: 3,
-    userId: 103,
-    paintingTitle: '비행기',
-    paintingUrl: 'assets/img/2d/image_0.png',
-    isRemoved: false,
-  ),
-  // 추가적인 샘플 아이템...
-];
-
-class DocumentPage extends StatelessWidget {
+class DocumentPage extends StatefulWidget {
   const DocumentPage({Key? key}) : super(key: key);
+
+  @override
+  _DocumentPageState createState() => _DocumentPageState();
+}
+
+class _DocumentPageState extends State<DocumentPage> {
+  List<Painting> paintings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // 페이지가 로드될 때 API 호출
+    fetchSketchbookList();
+  }
+
+  // API 호출 함수
+  Future<void> fetchSketchbookList() async {
+    try {
+      // API 서비스에서 데이터를 가져옴
+      final response = await ApiService().fetchSketchbookList();
+      setState(() {
+        // 응답 데이터가 리스트라고 가정하고 변환
+        paintings = (response['data'] as List).map<Painting>((json) {
+          return Painting(
+            paintingId: json['sketch_id'],
+            paintingTitle: json['sketch_title'],
+            paintingUrl: json['sketch_url'],
+          );
+        }).toList();
+      });
+    } catch (e) {
+      print(e); // 에러 발생 시 처리
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
-    List<Painting> paintings = samplePaintings; // 샘플 데이터 불러오기
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -79,7 +69,6 @@ class DocumentPage extends StatelessWidget {
         middle: Text(
           '스케치북',
           style: TextStyle(
-            //fontFamily: 'crayon',
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: CupertinoColors.systemGrey, // 텍스트 색상 변경
@@ -173,7 +162,7 @@ class DocumentPage extends StatelessWidget {
                               width: screenWidth / 6,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
+                                child: Image.network(
                                   painting.paintingUrl,
                                   fit: BoxFit.cover,
                                 ),
