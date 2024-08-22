@@ -239,7 +239,8 @@ class ApiService {
 
   Future<dynamic> fetchThreeDItems() async {
     try {
-      String? accessToken = await TokenStorage.getToken(); // Assuming this fetches the token asynchronously
+      String? accessToken = await TokenStorage
+          .getToken(); // Assuming this fetches the token asynchronously
       final response = await _dio.get(
         '/doc/3d/list', // Replace with your actual API endpoint for 3D items
         options: Options(
@@ -263,6 +264,38 @@ class ApiService {
       throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
+
+  // 3D 세부 조회 API 함수
+  Future<dynamic> fetch3DItemDetails({required int contentId}) async {
+    try {
+      // Access Token을 비동기로 가져오기
+      String? accessToken = await TokenStorage.getToken();
+
+      // GET 요청 보내기 (세부 조회 경로에 contentId 포함)
+      final response = await _dio.get(
+        '/doc/$contentId', // 경로에 contentId 삽입
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // 응답 확인
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print(responseData);
+        return responseData['data'];
+      } else {
+        throw Exception('3D 아이템 세부 조회에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+
 
   // 주문외우기 조회
   Future<dynamic> fetchMagicItems() async {
@@ -292,5 +325,3 @@ class ApiService {
     }
   }
 }
-
-
