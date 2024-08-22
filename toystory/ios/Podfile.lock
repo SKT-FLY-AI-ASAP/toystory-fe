@@ -3,6 +3,9 @@ PODS:
   - flutter_gl (0.0.3):
     - Flutter
     - three3d_egl (~> 0.1.3)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - speech_to_text (0.0.1):
     - Flutter
     - Try
@@ -17,6 +20,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_gl (from `.symlinks/plugins/flutter_gl/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - speech_to_text (from `.symlinks/plugins/speech_to_text/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
@@ -31,6 +35,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_gl:
     :path: ".symlinks/plugins/flutter_gl/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   speech_to_text:
     :path: ".symlinks/plugins/speech_to_text/ios"
   url_launcher_ios:
@@ -41,6 +47,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_gl: 5a5603f35db897697f064027864a32b15d0c421d
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   speech_to_text: b43a7d99aef037bd758ed8e45d79bbac035d2dfe
   three3d_egl: de2cd4950ad2d5f2122166c36583bde4c812e7b5
   Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96

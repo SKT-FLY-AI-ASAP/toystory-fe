@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
-class Sending3DDialog extends StatelessWidget {
-  const Sending3DDialog({Key? key}) : super(key: key);
+class DownloadSTLDialog extends StatelessWidget {
+  const DownloadSTLDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
-      title: const Text('3D 프린터로 파일을 전송 하시겠습니까?'),
+      title: const Text('3D 프린터용 파일을 다운로드 하시겠습니까?'),
       actions: [
         CupertinoDialogAction(
           isDefaultAction: true,

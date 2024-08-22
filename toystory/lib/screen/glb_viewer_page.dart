@@ -1,19 +1,10 @@
-import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:toystory/widget/sending_3D_dialog.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:toystory/widget/download_stl_dialog.dart';
+import 'package:toystory/services/stl_downloader.dart'; // URLLauncher 클래스를 import
 
 class My3DModel extends StatelessWidget {
   const My3DModel({super.key});
-
-  void _sendTo3DPrinter(BuildContext context) {
-    // Show the sending 3D dialog when the share icon is clicked
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const Sending3DDialog();
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,46 +18,21 @@ class My3DModel extends StatelessWidget {
           child: Icon(CupertinoIcons.back),
         ),
         trailing: GestureDetector(
-          // onTap: () {
-          //   _sendTo3DPrinter(context);
-          // },
           onTap: () async {
             // Show the confirm dialog on cube button press
             final result = await showCupertinoDialog<bool>(
               context: context,
               builder: (BuildContext context) {
-                return const Sending3DDialog(); // Your custom dialog
+                return const DownloadSTLDialog(); // 다운로드 확인을 위한 커스텀 다이얼로그
               },
             );
 
             if (result == true) {
-              showCupertinoDialog(
-                context: context,
-                builder: (context) {
-                  return CupertinoAlertDialog(
-                    title: const Text('3D 프린터 전송중'),
-                    content: Column(
-                      children: [
-                        const Text('3D 프린터로 전송중입니다...'),
-                        // const SizedBox(height: 16), // 간격 추가
-                        // Image.asset(
-                        //   'assets/img/loading/3D_loading.png', // 로컬 이미지 경로
-                        //   height: 150, // 이미지 크기
-                        //   width: 150,
-                        // ),
-                      ],
-                    ),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: const Text('확인'),
-                        onPressed: () {
-                          Navigator.of(context).pop(); // 확인 버튼 누를 시 다이얼로그 닫기
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
+              // 다운로드가 확인되었을 때 Safari로 STL 파일 다운로드 시작
+              const String fileUrl =
+                  'https://asap-bucket.s3.ap-northeast-2.amazonaws.com/3d-contents/1-stl/best_bear.stl';
+              await URLLauncher.openURL(
+                  context, fileUrl); // Safari로 파일 다운로드 URL 열기
             }
           },
           child: Icon(CupertinoIcons.share),
@@ -74,12 +40,13 @@ class My3DModel extends StatelessWidget {
       ),
       child: const ModelViewer(
         backgroundColor: Color.fromARGB(0xFF, 0xEE, 0xEE, 0xEE),
-        src: 'assets/glb/white_bear.glb',
+        src:
+            'https://asap-bucket.s3.ap-northeast-2.amazonaws.com/3d-contents/0-glb/tmp7flcqo65.glb',
         alt: 'A 3D model of a white bear',
         ar: true,
         autoRotate: true,
         iosSrc: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz',
-        disableZoom: true,
+        disableZoom: false,
       ),
     );
   }
