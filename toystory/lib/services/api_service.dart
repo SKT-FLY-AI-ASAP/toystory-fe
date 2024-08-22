@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 
 class TokenStorage {
   static String? _accessToken;
@@ -192,33 +194,38 @@ class ApiService {
     }
   }
 
-  // 스케치북 새로 만들기
+  // 스케치북 새로 만들기 (PNG 파일 업로드)
   Future<dynamic> createSketchbook({
-    required String title, // 스케치북 제목 같은 필드 추가
-    required String description, // 추가적인 필드 예시 //아 이게 png다ㅠㅠ
+    required String title, // 스케치북 제목
+    required File file, // PNG 파일
   }) async {
     try {
       String? accessToken = TokenStorage.getToken();
 
-      // POST 요청 보내기
+      // MultipartFile로 파일 변환
+      MultipartFile multipartFile = await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last, // 파일 이름 지정
+        contentType: MediaType('image', 'png'), // MIME 타입 지정
+      );
+
+      // POST 요청 보내기 (multipart/form-data)
       final response = await _dio.post(
         '/doc/2d',
         options: Options(headers: {
           'Authorization': 'Bearer $accessToken', // 토큰 추가
-          'content-type': 'multipart/form-data',
+          'Content-type': 'multipart/form-data', // Content-Type 지정
         }),
-        data: {
-          'title': title, // 요청에 필요한 필드 추가
-          'file': description, // 예시로 추가한 필드
-        },
+        data: FormData.fromMap({
+          'title': title, // 요청에 필요한 필드
+          'file': multipartFile, // PNG 파일 업로드
+        }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final responseData = response.data;
         print('스케치북 생성 성공: $responseData');
-
-        // 생성된 스케치북 데이터를 반환
-        return responseData;
+        return responseData; // 생성된 스케치북 데이터 반환
       } else {
         throw Exception('스케치북 생성에 실패했습니다. 다시 시도해주세요.');
       }

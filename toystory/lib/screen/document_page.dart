@@ -26,9 +26,9 @@ class _DocumentPageState extends State<DocumentPage> {
   List<Painting> paintings = [];
 
   @override
-  void initState() {
-    super.initState();
-    // 페이지가 로드될 때 API 호출
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 페이지가 다시 로드될 때마다 API 호출
     fetchSketchbookList();
   }
 
@@ -59,10 +59,9 @@ class _DocumentPageState extends State<DocumentPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: const Color.fromARGB(18, 54, 23, 206),
-        // 배경색 변경
         border: Border(
           bottom: BorderSide(
-            color: CupertinoColors.systemGrey, // 하단 경계선 색상 변경
+            color: CupertinoColors.systemGrey,
             width: 0.0,
           ),
         ),
@@ -71,7 +70,7 @@ class _DocumentPageState extends State<DocumentPage> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: CupertinoColors.systemGrey, // 텍스트 색상 변경
+            color: CupertinoColors.systemGrey,
           ),
         ),
         trailing: Row(
@@ -85,7 +84,7 @@ class _DocumentPageState extends State<DocumentPage> {
               child: Icon(
                 CupertinoIcons.trash,
                 color: const Color.fromARGB(255, 54, 23, 206),
-                size: 22.0, // 아이콘 색상 변경
+                size: 22.0,
               ),
             ),
             const SizedBox(width: 8),
@@ -95,11 +94,10 @@ class _DocumentPageState extends State<DocumentPage> {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 16), // 네비게이션 바와 컨텐츠 사이에 간격 추가
+          const SizedBox(height: 16),
           Expanded(
             child: Container(
-              color:
-                  CupertinoColors.extraLightBackgroundGray, // SafeArea의 배경색 변경
+              color: CupertinoColors.extraLightBackgroundGray,
               child: SafeArea(
                 child: GridView.count(
                   crossAxisCount: 5,
@@ -116,8 +114,7 @@ class _DocumentPageState extends State<DocumentPage> {
                                 Navigator.of(context, rootNavigator: true).push(
                                   CupertinoPageRoute(
                                     fullscreenDialog: false,
-                                    builder: (context) =>
-                                        const DrawPage(title: '제목'),
+                                    builder: (context) => const DrawPage(),
                                   ),
                                 );
                               },
