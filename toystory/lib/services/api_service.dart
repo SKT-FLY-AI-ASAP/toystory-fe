@@ -1,5 +1,24 @@
 import 'package:dio/dio.dart';
 
+class TokenStorage {
+  static String? _accessToken;
+
+  // Access Token 저장
+  static void saveToken(String token) {
+    _accessToken = token;
+  }
+
+  // Access Token 가져오기
+  static String? getToken() {
+    return _accessToken;
+  }
+
+  // Access Token 삭제
+  static void clearToken() {
+    _accessToken = null;
+  }
+}
+
 class ApiService {
   final Dio _dio = Dio();
 
@@ -123,6 +142,10 @@ class ApiService {
       print(response.statusCode);
 
       if (response.statusCode == 201) {
+        TokenStorage.saveToken(response.data['data']['access_token']);
+        //print(response.data['data']['access_token']);
+        //print(response.data[data]['access_token']);
+        //print(responseData['data']['access_token']);
         print('Login successful.');
       } else {
         print(response.data);
