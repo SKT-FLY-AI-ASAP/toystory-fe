@@ -6,7 +6,7 @@ class Confirm3DTransformDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
-      title: const Text('3D 변환을 하시겠습니까?'),
+      title: const Text('장난감으로 만드시겠습니까?'),
       actions: [
         CupertinoDialogAction(
           isDefaultAction: true,

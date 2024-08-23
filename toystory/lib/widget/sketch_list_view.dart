@@ -60,7 +60,7 @@ class _SketchListViewState extends State<SketchListView> {
                 CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: CupertinoColors.systemPurple,
+                      color: CupertinoColors.systemIndigo,
                     ),
           ),
           SizedBox(height: 10),
@@ -69,15 +69,20 @@ class _SketchListViewState extends State<SketchListView> {
               height: double.infinity,
               child: sketches.isEmpty
                   ? Center(child: CupertinoActivityIndicator()) // 로딩 중 표시
-                  : ListView(
+                  : ListView.separated(
+                      // ListView.separated로 간격을 설정
                       scrollDirection: Axis.horizontal,
-                      children: sketches.map((sketch) {
+                      itemCount: sketches.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: 20), // 간격을 줄이거나 늘릴 수 있음
+                      itemBuilder: (context, index) {
+                        final sketch = sketches[index];
                         return SketchCard(
                           sketchId: sketch.sketchId,
                           sketchTitle: sketch.sketchTitle,
                           sketchUrl: sketch.sketchUrl,
                         );
-                      }).toList(),
+                      },
                     ),
             ),
           ),

@@ -7,15 +7,18 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: CupertinoColors.systemPurple.withOpacity(0.3),
+      color: CupertinoColors.systemIndigo.withOpacity(0.3),
       padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.white,
-            child: Icon(CupertinoIcons.person, size: 40),
+          // 로고 이미지 추가
+          SizedBox(
+            height: 150, // 로고 이미지 크기 조정
+            child: Image.asset(
+              'assets/logo/toystory_logo2.png', // 로고 이미지 경로
+              fit: BoxFit.contain, // 이미지가 부모 위젯 안에 맞게 조정
+            ),
           ),
           SizedBox(height: 20),
           Text(
@@ -50,7 +53,7 @@ class Sidebar extends StatelessWidget {
 
           // 주문외우기 버튼
           CupertinoButton(
-            color: const Color.fromARGB(190, 238, 72, 236),
+            color: CupertinoColors.systemIndigo,
             onPressed: () {
               print("주문외우기 버튼이 클릭되었습니다!");
               showMagicDialog(context);
@@ -74,10 +77,7 @@ class Sidebar extends StatelessWidget {
 
           // 그림그리기 버튼
           CupertinoButton(
-            color: const Color.fromARGB(190, 238, 72, 236),
-            // onPressed: () {
-            //   print("그림그리기 버튼이 클릭되었습니다!");
-            // },
+            color: CupertinoColors.systemIndigo,
             onPressed: () {
               Navigator.of(context, rootNavigator: true).push(
                 CupertinoPageRoute(

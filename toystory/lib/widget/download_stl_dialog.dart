@@ -6,7 +6,7 @@ class DownloadSTLDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
-      title: const Text('3D 프린터용 파일을 다운로드 하시겠습니까?'),
+      title: const Text('3D 프린트용 파일을 다운로드 하시겠습니까?'),
       actions: [
         CupertinoDialogAction(
           isDefaultAction: true,

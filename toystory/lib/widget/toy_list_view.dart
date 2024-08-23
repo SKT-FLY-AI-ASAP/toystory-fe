@@ -25,13 +25,13 @@ class _ToyListViewState extends State<ToyListView> {
   @override
   void initState() {
     super.initState();
-    fetchToyList(); // 위젯이 초기화될 때 API에서 데이터를 가져옴
+    fetchToyList(); // 데이터를 가져오는 함수 호출
   }
 
   // API 호출 함수
   Future<void> fetchToyList() async {
     try {
-      // 예시: API 호출을 통해 장난감 리스트를 가져온다고 가정
+      // API 서비스에서 데이터를 가져옴
       final response = await ApiService().fetchThreeDItems();
       setState(() {
         // 응답 데이터를 Toy 객체 리스트로 변환
@@ -60,7 +60,7 @@ class _ToyListViewState extends State<ToyListView> {
                 CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: CupertinoColors.systemPurple,
+                      color: CupertinoColors.systemIndigo,
                     ),
           ),
           SizedBox(height: 10),
@@ -69,15 +69,19 @@ class _ToyListViewState extends State<ToyListView> {
               height: double.infinity,
               child: toys.isEmpty
                   ? Center(child: CupertinoActivityIndicator()) // 로딩 인디케이터
-                  : ListView(
+                  : ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      children: toys.map((toy) {
+                      itemCount: toys.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: 20), // 아이템 사이의 간격 설정
+                      itemBuilder: (context, index) {
+                        final toy = toys[index];
                         return ToyCard(
                           toyId: toy.toyId,
                           toyTitle: toy.toyTitle,
                           toyUrl: toy.toyUrl,
                         );
-                      }).toList(),
+                      },
                     ),
             ),
           ),

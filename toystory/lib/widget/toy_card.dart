@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:toystory/screen/sketch_viewer_page.dart';
-import 'package:toystory/screen/glb_viewer_page.dart';
+import 'package:toystory/screen/glb_viewer_page.dart'; // My3DModel 페이지 임포트
 
 class ToyCard extends StatelessWidget {
   final int toyId;
@@ -17,26 +16,11 @@ class ToyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 300,
-      height: 300,
+      width: 250, // 정사각형 크기 설정
+      height: 250, // 정사각형 크기 설정
       child: CupertinoButton(
-        padding: EdgeInsets.all(8.0),
-        // onPressed: () {
-        //   // ToyCard 클릭 시 SketchViewerPage로 이동
-        //   print('ToyCard 클릭: $toyTitle');
-        //   Navigator.push(
-        //     context,
-        //     CupertinoPageRoute(
-        //       builder: (context) => SketchViewer(
-        //         title: toyTitle,
-        //         imageUrl: toyUrl,
-        //         imageId: toyId,
-        //       ),
-        //     ),
-        //   );
-        // },
         onPressed: () {
-          // content_id를 My3DModel에 전달하여 3D 뷰어로 이동
+          // contentId를 My3DModel에 전달하여 3D 뷰어로 이동
           Navigator.push(
             context,
             CupertinoPageRoute(
@@ -45,7 +29,6 @@ class ToyCard extends StatelessWidget {
               ),
             ),
           );
-          //print('${item.contentTitle} 클릭됨');
         },
         child: Card(
           elevation: 4,
@@ -53,22 +36,30 @@ class ToyCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 원격 이미지를 로드하는 부분
                 SizedBox(
-                  height: 200,
-                  width: 200,
+                  height: 200, // 원하는 이미지의 고정 높이
+                  width: 200, // 원하는 이미지의 고정 너비
                   child: Image.network(
                     toyUrl,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                     errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.error,
-                        color: Colors.red,
-                      ); // 오류 발생 시 표시
+                      return Container(
+                        color: Colors.white, // 이미지 로드 실패 시 흰색 네모를 표시
+                        child: Center(
+                          child: Text(
+                            '이미지 불러오기 실패',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ),
