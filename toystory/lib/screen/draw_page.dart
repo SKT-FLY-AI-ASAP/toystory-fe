@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
-import 'package:toystory/widget/confirm_3d_dialog.dart';
+import 'home_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toystory/services/api_service.dart';
 import 'dart:io';
@@ -85,48 +85,6 @@ class _DrawPageState extends State<DrawPage> {
 
   List<Widget> _buildActions(BuildContext context) {
     return [
-      // CupertinoButton(
-      //   padding: EdgeInsets.zero,
-      //   onPressed: () async {
-      //     final result = await showCupertinoDialog<bool>(
-      //       context: context,
-      //       builder: (BuildContext context) {
-      //         return const Confirm3DTransformDialog();
-      //       },
-      //     );
-
-      //     if (result == true) {
-      //       showCupertinoDialog(
-      //         context: context,
-      //         builder: (context) {
-      //           return CupertinoAlertDialog(
-      //             title: const Text('3D 변환중'),
-      //             content: Column(
-      //               children: [
-      //                 const Text('3D 변환 중입니다...'),
-      //                 const SizedBox(height: 16),
-      //                 Image.asset(
-      //                   'assets/img/loading/3D_loading.png',
-      //                   height: 150,
-      //                   width: 150,
-      //                 ),
-      //               ],
-      //             ),
-      //             actions: [
-      //               CupertinoDialogAction(
-      //                 child: const Text('확인'),
-      //                 onPressed: () {
-      //                   Navigator.of(context).pop();
-      //                 },
-      //               ),
-      //             ],
-      //           );
-      //         },
-      //       );
-      //     }
-      //   },
-      //   child: const Icon(CupertinoIcons.cube),
-      // ),
       ValueListenableBuilder(
         valueListenable: notifier,
         builder: (context, value, child) => CupertinoButton(
@@ -148,44 +106,101 @@ class _DrawPageState extends State<DrawPage> {
         onPressed: notifier.clear,
         child: const Icon(CupertinoIcons.clear),
       ),
-      // 저장 버튼 추가
       CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () async {
-          final ByteData? imageData = await notifier.renderImage();
+          // 저장 여부를 물어보는 다이얼로그 표시
+          final shouldSave = await showCupertinoDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return CupertinoAlertDialog(
+                title: const Text('저장 확인'),
+                content: const Text('스케치를 저장하시겠습니까?'),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('저장'),
+                    isDefaultAction: true,
+                    onPressed: () {
+                      Navigator.of(context).pop(true); // 저장 -> true 반환
+                    },
+                  ),
+                  CupertinoDialogAction(
+                    child: const Text('취소'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false); // 취소 -> false 반환
+                    },
+                  ),
+                ],
+              );
+            },
+          );
 
-          if (imageData != null) {
-            final Uint8List imageBytes = imageData.buffer.asUint8List();
-            final savedFile = await _saveImageToFile(imageBytes);
-            if (savedFile != null) {
-              try {
-                await ApiService().createSketchbook(
-                  title: _titleController.text,
-                  file: savedFile,
+          if (shouldSave == true) {
+            // "저장 중" 다이얼로그 표시
+            showCupertinoDialog(
+              context: context,
+              barrierDismissible: false, // 다른 곳을 클릭해도 다이얼로그가 닫히지 않음
+              builder: (BuildContext context) {
+                return CupertinoAlertDialog(
+                  title: const Text('저장 중...'),
+                  content: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: CupertinoActivityIndicator(radius: 15),
+                  ),
                 );
+              },
+            );
 
-                // 저장 성공 시 다이얼로그 표시
-                showCupertinoDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return CupertinoAlertDialog(
-                      title: const Text('저장 성공'),
-                      content: const Text('스케치북이 성공적으로 생성되었습니다.'),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: const Text('확인'),
-                          onPressed: () {
-                            Navigator.of(context).pop(); // 다이얼로그 닫기
-                            Navigator.of(context).pop(); // 뒤로 가기
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              } catch (e) {
-                print(e);
+            // 이미지 생성 및 저장 작업
+            final ByteData? imageData = await notifier.renderImage();
+            if (imageData != null) {
+              final Uint8List imageBytes = imageData.buffer.asUint8List();
+              final savedFile = await _saveImageToFile(imageBytes);
+
+              if (savedFile != null) {
+                try {
+                  await ApiService().createSketchbook(
+                    title: _titleController.text,
+                    file: savedFile,
+                  );
+
+                  // "저장 중" 다이얼로그 닫기
+                  Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
+
+                  // 저장 성공 메시지 표시 및 HomePage로 이동
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CupertinoAlertDialog(
+                        title: const Text('저장 성공'),
+                        content: const Text('스케치북이 성공적으로 생성되었습니다.'),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: const Text('확인'),
+                            onPressed: () {
+                              Navigator.of(context).pop(); // 다이얼로그 닫기
+                              // HomePage로 이동
+                              Navigator.pushReplacement(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => HomePage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } catch (e) {
+                  // 저장 중 다이얼로그 닫기
+                  Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
+                  print(e);
+                }
               }
+            } else {
+              // 저장 중 다이얼로그 닫기
+              Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
             }
           }
         },

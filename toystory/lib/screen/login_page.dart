@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'signup_page.dart';
-import 'root_page.dart';
-import 'package:toystory/services/api_service.dart'; // Make sure to import your ApiService
+import 'home_page.dart';
+import 'package:toystory/services/api_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-          builder: (context) => RootPage(),
+          builder: (context) => HomePage(),
         ),
       );
     } catch (e) {

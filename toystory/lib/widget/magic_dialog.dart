@@ -85,7 +85,7 @@ class _MagicDialogState extends State<MagicDialog> {
               _isListening
                   ? CupertinoIcons.stop_circle
                   : CupertinoIcons.mic_circle,
-              size: 50,
+              size: 150,
               color: const Color.fromARGB(255, 54, 23, 206),
             ),
           ),
