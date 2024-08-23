@@ -85,8 +85,8 @@ class _MagicDialogState extends State<MagicDialog> {
               _isListening
                   ? CupertinoIcons.stop_circle
                   : CupertinoIcons.mic_circle,
-              size: 50,
-              color: const Color.fromARGB(255, 54, 23, 206),
+              size: 150,
+              color: CupertinoColors.systemIndigo,
             ),
           ),
           const SizedBox(height: 30),
@@ -102,11 +102,17 @@ class _MagicDialogState extends State<MagicDialog> {
             ),
           const SizedBox(height: 30),
           CupertinoButton(
+            color: CupertinoColors.systemIndigo, // 배경 색 지정
             onPressed: () {
               // 그림 만들기 로직 추가
             },
-            child: const Text('그림 만들기'),
-          ),
+            child: const Text(
+              '그림 만들기',
+              style: TextStyle(
+                color: CupertinoColors.white, // 텍스트 색상도 설정 가능
+              ),
+            ),
+          )
         ],
       ),
     );
