@@ -45,13 +45,15 @@ class _My3DModelState extends State<My3DModel> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
-        middle: Text(contentTitle ?? 'Loading...',
-            style: TextStyle(color: CupertinoColors.white)), // 모델 제목 표시
+        middle: Text(
+          contentTitle ?? 'Loading...',
+          style: const TextStyle(color: CupertinoColors.white),
+        ), // 모델 제목 표시
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             CupertinoIcons.back,
             color: CupertinoColors.white, // 뒤로가기 버튼 색상 변경
           ),
@@ -59,12 +61,18 @@ class _My3DModelState extends State<My3DModel> {
       ),
       child: Stack(
         children: [
+          // 배경 이미지
+          Positioned.fill(
+            child: Image.asset(
+              'assets/img/design/toystory_loading.gif', // 배경 이미지 경로
+              fit: BoxFit.cover, // 이미지가 전체 화면을 덮도록 설정
+            ),
+          ),
           // 모델 뷰어
           modelUrl != null
               ? ModelViewer(
-                  backgroundColor: const Color.fromARGB(0xFF, 0xEE, 0xEE, 0xEE),
+                  backgroundColor: Colors.transparent, // 배경 투명 설정
                   src: modelUrl!, // 동적으로 받아온 모델 URL 적용
-                  //src: 'assets/obj/임지혜.glb',
                   alt: contentTitle ?? 'A 3D model of a toy', // 모델 제목 표시
                   ar: true,
                   autoRotate: true,

@@ -90,7 +90,8 @@ class _DrawPageState extends State<DrawPage> {
         builder: (context, value, child) => CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: notifier.canUndo ? notifier.undo : null,
-          child: const Icon(CupertinoIcons.arrow_turn_up_left),
+          child: const Icon(CupertinoIcons.arrow_turn_up_left,
+              color: CupertinoColors.systemIndigo),
         ),
       ),
       ValueListenableBuilder(
@@ -98,13 +99,15 @@ class _DrawPageState extends State<DrawPage> {
         builder: (context, value, child) => CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: notifier.canRedo ? notifier.redo : null,
-          child: const Icon(CupertinoIcons.arrow_turn_up_right),
+          child: const Icon(CupertinoIcons.arrow_turn_up_right,
+              color: CupertinoColors.systemIndigo),
         ),
       ),
       CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: notifier.clear,
-        child: const Icon(CupertinoIcons.clear),
+        child: const Icon(CupertinoIcons.clear,
+            color: CupertinoColors.systemIndigo),
       ),
       CupertinoButton(
         padding: EdgeInsets.zero,
@@ -204,7 +207,8 @@ class _DrawPageState extends State<DrawPage> {
             }
           }
         },
-        child: const Icon(CupertinoIcons.cloud_upload),
+        child: const Icon(CupertinoIcons.cloud_upload,
+            color: CupertinoColors.systemIndigo),
       ),
     ];
   }
@@ -303,7 +307,8 @@ class _DrawPageState extends State<DrawPage> {
         outlineColor: Colors.black,
         isActive: isErasing,
         onPressed: () => notifier.setEraser(),
-        child: const Icon(Icons.cleaning_services),
+        child: const Icon(Icons.cleaning_services,
+            color: CupertinoColors.systemIndigo),
       ),
     );
   }

@@ -352,4 +352,44 @@ class ApiService {
       throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
+
+  //가입 정보 조회
+  Future<dynamic> fetchUserInfo() async {
+    try {
+      String? accessToken = await TokenStorage.getToken();
+      final response = await _dio.get(
+        '/user/info',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        return responseData;
+      } else {
+        throw Exception('사용자 정보 조회에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  //스케치북 장난감 생성 요청
+  Future<void> createToy({required int toyId}) async {
+    try {
+      String? accessToken = await TokenStorage.getToken();
+      final response = await _dio.post(
+        '/2d/$toyId', // 로그아웃 API 엔드포인트
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+          },
+        ),
+      );
+    } catch (e) {}
+  }
 }

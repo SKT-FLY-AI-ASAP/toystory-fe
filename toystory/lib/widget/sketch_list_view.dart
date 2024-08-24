@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:toystory/widget/settings_button.dart';
 import 'package:toystory/widget/sketch_card.dart';
 import 'package:toystory/services/api_service.dart';
 
@@ -54,19 +55,28 @@ class _SketchListViewState extends State<SketchListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '스케치북',
-            style:
-                CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
+          // 스케치북 제목과 설정 아이콘을 나란히 배치
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우로 배치
+            children: [
+              Text(
+                '스케치북',
+                style: CupertinoTheme.of(context)
+                    .textTheme
+                    .navTitleTextStyle
+                    .copyWith(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: CupertinoColors.systemIndigo,
                     ),
+              ),
+              SettingsButton(),
+            ],
           ),
           SizedBox(height: 10),
           Expanded(
             child: Container(
-              height: double.infinity,
+              //height: double.infinity,
               child: sketches.isEmpty
                   ? Center(child: CupertinoActivityIndicator()) // 로딩 중 표시
                   : ListView.separated(
