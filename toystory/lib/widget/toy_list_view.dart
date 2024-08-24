@@ -66,7 +66,7 @@ class _ToyListViewState extends State<ToyListView> {
           SizedBox(height: 10),
           Expanded(
             child: Container(
-              height: double.infinity,
+              //height: double.infinity,
               child: toys.isEmpty
                   ? Center(child: CupertinoActivityIndicator()) // 로딩 인디케이터
                   : ListView.separated(
