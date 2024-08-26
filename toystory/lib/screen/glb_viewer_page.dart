@@ -15,65 +15,69 @@ class My3DModel extends StatefulWidget {
 }
 
 class _My3DModelState extends State<My3DModel> {
-  String? modelUrl; // GLB 파일의 URL을 저장하는 변수
-  String? stlUrl; // STL 파일의 URL을 저장하는 변수
-  String? contentTitle; // 모델의 제목을 저장하는 변수
+  String? modelUrlWithBackground;
+  String? modelUrlWithoutBackground;
+  String? stlUrl;
+  String? contentTitle;
+  bool showBackground = true; // 배경 표시 여부를 위한 상태 변수
 
   @override
   void initState() {
     super.initState();
-    fetch3DModelData(); // 초기화 시 3D 모델 데이터를 가져옴
+    fetch3DModelData();
   }
 
-  // 3D 모델 데이터를 API에서 받아오는 함수
   Future<void> fetch3DModelData() async {
     try {
       final response =
           await ApiService().fetch3DItemDetails(contentId: widget.contentId);
       setState(() {
-        modelUrl = response['content_url']; // 모델의 GLB URL
-        stlUrl = response['design_url']; // STL 파일의 다운로드 URL
-        contentTitle = response['content_title']; // 모델의 제목
+        modelUrlWithBackground =
+            response['content_url_with_bg']; // 배경이 있는 GLB 파일
+        modelUrlWithoutBackground =
+            response['content_url_without_bg']; // 배경 없는 GLB 파일
+        stlUrl = response['design_url'];
+        contentTitle = response['content_title'];
       });
     } catch (e) {
       print('3D 모델 데이터 로드 실패: $e');
+      setState(() {
+        modelUrlWithBackground = null;
+        modelUrlWithoutBackground = null;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 배경 유무에 따라 해당하는 모델 URL을 선택
+    final modelUrl =
+        showBackground ? modelUrlWithBackground : modelUrlWithoutBackground;
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
         middle: Text(
           contentTitle ?? 'Loading...',
           style: const TextStyle(color: CupertinoColors.white),
-        ), // 모델 제목 표시
+        ),
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
           child: const Icon(
             CupertinoIcons.back,
-            color: CupertinoColors.white, // 뒤로가기 버튼 색상 변경
+            color: CupertinoColors.white,
           ),
         ),
       ),
       child: Stack(
         children: [
-          // 배경 이미지
-          Positioned.fill(
-            child: Image.asset(
-              'assets/img/design/toystory_loading.gif', // 배경 이미지 경로
-              fit: BoxFit.cover, // 이미지가 전체 화면을 덮도록 설정
-            ),
-          ),
-          // 모델 뷰어
-          modelUrl != null
+          modelUrl != null && modelUrl!.isNotEmpty
               ? ModelViewer(
-                  backgroundColor: Colors.transparent, // 배경 투명 설정
-                  src: modelUrl!, // 동적으로 받아온 모델 URL 적용
-                  alt: contentTitle ?? 'A 3D model of a toy', // 모델 제목 표시
+                  backgroundColor: Colors.transparent,
+                  src: modelUrl!,
+                  alt: contentTitle ?? 'A 3D model of a toy',
                   ar: true,
                   autoRotate: true,
                   iosSrc:
@@ -81,11 +85,10 @@ class _My3DModelState extends State<My3DModel> {
                   disableZoom: false,
                 )
               : const Center(
-                  child: CupertinoActivityIndicator(),
+                  child: Text('3D 모델을 불러올 수 없습니다.'),
                 ),
-          // Floating Action Button
           Positioned(
-            bottom: 30,
+            bottom: 80, // 세그먼트 컨트롤러 위에 배치되도록 버튼을 위로 이동
             right: 30,
             child: CupertinoButton(
               color: CupertinoColors.systemIndigo,
@@ -95,25 +98,22 @@ class _My3DModelState extends State<My3DModel> {
               ),
               borderRadius: BorderRadius.circular(30),
               onPressed: () async {
-                // STL 파일 다운로드 확인 다이얼로그 표시
                 final result = await showCupertinoDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
-                    return const DownloadSTLDialog(); // 다운로드 확인을 위한 커스텀 다이얼로그
+                    return const DownloadSTLDialog();
                   },
                 );
 
                 if (result == true && stlUrl != null) {
-                  // STL 파일 다운로드 시작
-                  await URLLauncher.openURL(
-                      context, stlUrl!); // Safari로 STL 파일 다운로드 URL 열기
+                  await URLLauncher.openURL(context, stlUrl!);
                 }
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(CupertinoIcons.cloud_download,
-                      color: CupertinoColors.white), // 다운로드 아이콘 추가
+                      color: CupertinoColors.white),
                   SizedBox(width: 8),
                   Text(
                     '3D 프린트용 파일 다운로드',
@@ -124,6 +124,26 @@ class _My3DModelState extends State<My3DModel> {
                   ),
                 ],
               ),
+            ),
+          ),
+          Positioned(
+            bottom: 30, // 하단에 세그먼트 컨트롤러 배치
+            left: 30,
+            right: 30,
+            child: CupertinoSegmentedControl<bool>(
+              children: const {
+                true: Text('배경 있음'),
+                false: Text('배경 없음'),
+              },
+              onValueChanged: (bool value) {
+                setState(() {
+                  showBackground = value; // 사용자 선택에 따라 배경 상태 변경
+                });
+              },
+              groupValue: showBackground,
+              selectedColor: CupertinoColors.systemIndigo, // 선택된 색상 설정
+              unselectedColor: CupertinoColors.white, // 선택되지 않은 색상 설정
+              borderColor: CupertinoColors.systemIndigo, // 테두리 색상 설정
             ),
           ),
         ],
