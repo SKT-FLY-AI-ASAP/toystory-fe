@@ -379,17 +379,65 @@ class ApiService {
   }
 
   //스케치북 장난감 생성 요청
-  Future<void> createToy({required int toyId}) async {
+  Future<dynamic> createToy({
+    required int sketch_id,
+    required String title,
+  }) async {
     try {
       String? accessToken = await TokenStorage.getToken();
       final response = await _dio.post(
-        '/2d/$toyId', // 로그아웃 API 엔드포인트
+        '/2d/3d', // 로그아웃 API 엔드포인트
+        data: {
+          'sketch_id': sketch_id,
+          'title': title,
+        },
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
           },
         ),
       );
-    } catch (e) {}
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        return responseData;
+      } else {
+        throw Exception('장난감 생성에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  //주문 외우기 새로 만들기
+  Future<void> createStt(
+      {required String title, required String prompt}) async {
+    try {
+      String? accessToken = await TokenStorage.getToken();
+      final response = await _dio.post(
+        '/doc/stt/3d', // 로그아웃 API 엔드포인트
+        data: {
+          'title': title,
+          'prompt': prompt,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+            'Content-type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        return responseData;
+      } else {
+        throw Exception('주문외우기에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
   }
 }

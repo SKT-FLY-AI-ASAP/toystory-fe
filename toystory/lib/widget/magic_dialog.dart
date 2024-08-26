@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/reusable_dialog.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:toystory/services/api_service.dart';
 
 class MagicDialog extends StatefulWidget {
   const MagicDialog({Key? key}) : super(key: key);
@@ -14,6 +15,8 @@ class _MagicDialogState extends State<MagicDialog> {
   bool _isListening = false;
   String _recognizedText = "여기에 음성 인식된 텍스트가 표시됩니다.";
   String _finalRecognizedText = ""; // 최종 녹음된 텍스트를 저장
+  TextEditingController _titleController =
+      TextEditingController(); // title 입력을 위한 컨트롤러
 
   @override
   void initState() {
@@ -47,6 +50,85 @@ class _MagicDialogState extends State<MagicDialog> {
     }
   }
 
+  Future<void> _createToy(BuildContext context) async {
+    String title = _titleController.text.isNotEmpty
+        ? _titleController.text
+        : "기본 제목"; // 사용자가 title 입력을 안했을 경우 기본 제목 사용
+
+    try {
+      // 로딩 다이얼로그 표시
+      showCupertinoDialog(
+        context: context,
+        barrierDismissible: false, // 다이얼로그 밖을 클릭해도 닫히지 않게
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('3D 변환중'),
+            content: Column(
+              children: const [
+                SizedBox(height: 16),
+                CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
+                SizedBox(height: 16),
+                Text('3D 변환 중입니다...'),
+              ],
+            ),
+          );
+        },
+      );
+
+      // 장난감 만들기 API 호출
+      final response = await ApiService().createStt(
+        title: title, // 사용자가 입력한 title 사용
+        prompt: _finalRecognizedText.isNotEmpty
+            ? _finalRecognizedText
+            : "기본 프롬프트", // 녹음된 텍스트를 프롬프트로 사용
+      );
+
+      // 로딩 다이얼로그 닫기
+      Navigator.of(context).pop();
+
+      // 성공 다이얼로그 표시
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('3D 변환 성공'),
+            content: const Text('장난감 변환이 완료되었습니다!'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      // 로딩 다이얼로그 닫기
+      Navigator.of(context).pop();
+
+      // 실패 다이얼로그 표시
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('3D 변환 실패'),
+            content: const Text('장난감 변환에 실패했습니다. 다시 시도해주세요.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ReusableDialog(
@@ -54,15 +136,15 @@ class _MagicDialogState extends State<MagicDialog> {
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             '무한한 공간 저 너머로 주문을 전달하는 중 ...',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: CupertinoColors.black,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           Container(
             width: 500,
             height: 100,
@@ -78,18 +160,18 @@ class _MagicDialogState extends State<MagicDialog> {
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           GestureDetector(
             onTap: _toggleListening,
             child: Icon(
               _isListening
                   ? CupertinoIcons.stop_circle
                   : CupertinoIcons.mic_circle,
-              size: 150,
+              size: 70,
               color: CupertinoColors.systemIndigo,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           if (!_isListening && _finalRecognizedText.isNotEmpty)
             // 녹음이 끝나면 최종 텍스트를 표시
             Text(
@@ -100,11 +182,19 @@ class _MagicDialogState extends State<MagicDialog> {
               ),
               textAlign: TextAlign.center,
             ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
+          // 제목 입력 필드 추가
+          CupertinoTextField(
+            controller: _titleController,
+            placeholder: "제목을 입력하세요",
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          ),
+          const SizedBox(height: 20),
           CupertinoButton(
             color: CupertinoColors.systemIndigo, // 배경 색 지정
             onPressed: () {
-              // 그림 만들기 로직 추가
+              // 그림 만들기 API 호출
+              _createToy(context);
             },
             child: const Text(
               '그림 만들기',
@@ -112,7 +202,7 @@ class _MagicDialogState extends State<MagicDialog> {
                 color: CupertinoColors.white, // 텍스트 색상도 설정 가능
               ),
             ),
-          )
+          ),
         ],
       ),
     );

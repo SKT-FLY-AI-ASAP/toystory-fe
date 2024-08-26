@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:toystory/widget/confirm_3d_dialog.dart';
+import 'package:toystory/services/api_service.dart';
 
 class SketchViewer extends StatelessWidget {
   final String title;
@@ -12,6 +12,54 @@ class SketchViewer extends StatelessWidget {
     required this.imageUrl,
     required this.imageId,
   });
+
+  Future<void> _convertToToy(BuildContext context) async {
+    try {
+      // 3D 변환 요청 API 호출
+      final response =
+          await ApiService().createToy(sketch_id: imageId, title: title);
+
+      // API 응답이 성공적일 때
+      Navigator.of(context).pop(); // 로딩 다이얼로그 닫기
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('3D 변환 성공'),
+            content: const Text('장난감 변환이 완료되었습니다!'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      // 에러 발생 시
+      Navigator.of(context).pop(); // 로딩 다이얼로그 닫기
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('3D 변환 실패'),
+            content: const Text('장난감 변환에 실패했습니다. 다시 시도해주세요.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,33 +114,27 @@ class SketchViewer extends StatelessWidget {
                 );
 
                 if (result == true) {
+                  // 로딩 다이얼로그 표시
                   showCupertinoDialog(
                     context: context,
+                    barrierDismissible: false, // 다이얼로그 밖을 클릭해도 닫히지 않게
                     builder: (context) {
                       return CupertinoAlertDialog(
                         title: const Text('3D 변환중'),
                         content: Column(
                           children: [
-                            const Text('3D 변환 중입니다...'),
                             const SizedBox(height: 16),
-                            Image.asset(
-                              'assets/img/loading/3D_loading.png',
-                              height: 150,
-                              width: 150,
-                            ),
+                            CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
+                            const SizedBox(height: 16),
+                            const Text('3D 변환 중입니다...'),
                           ],
                         ),
-                        actions: [
-                          CupertinoDialogAction(
-                            child: const Text('확인'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
                       );
                     },
                   );
+
+                  // API 요청 시작
+                  await _convertToToy(context);
                 }
               },
               child: Row(

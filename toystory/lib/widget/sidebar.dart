@@ -39,18 +39,6 @@ class _SidebarState extends State<Sidebar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Flexible(
-            flex: 2,
-            child: Center(
-              child: SizedBox(
-                height: 150,
-                child: Image.asset(
-                  'assets/logo/toystory_logo2.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
           const SizedBox(height: 20),
           Flexible(
             flex: 3,
@@ -92,57 +80,84 @@ class _SidebarState extends State<Sidebar> {
               ),
             ),
           ),
-          const SizedBox(height: 100),
+          const SizedBox(height: 200),
           Flexible(
             flex: 2,
             child: Center(
               child: Column(
                 children: [
-                  CupertinoButton(
-                    color: CupertinoColors.systemIndigo,
-                    onPressed: () {
-                      print("주문외우기 버튼이 클릭되었습니다!");
-                      showMagicDialog(context);
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.auto_fix_high, color: CupertinoColors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          '주문외우기',
-                          style: TextStyle(
-                            color: CupertinoColors.white,
-                            fontSize: 18,
-                          ),
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 6,
+                          offset: Offset(2, 4),
                         ),
                       ],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: CupertinoButton(
+                      color: CupertinoColors.systemIndigo,
+                      onPressed: () {
+                        print("주문외우기 버튼이 클릭되었습니다!");
+                        showMagicDialog(context);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.auto_fix_high,
+                              color: CupertinoColors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            '주문외우기',
+                            style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  CupertinoButton(
-                    color: CupertinoColors.systemIndigo,
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).push(
-                        CupertinoPageRoute(
-                          fullscreenDialog: false,
-                          builder: (context) => const DrawPage(),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.palette, color: CupertinoColors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          '그림그리기',
-                          style: TextStyle(
-                            color: CupertinoColors.white,
-                            fontSize: 18,
-                          ),
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 6,
+                          offset: Offset(2, 4),
                         ),
                       ],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: CupertinoButton(
+                      color: CupertinoColors.systemIndigo,
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).push(
+                          CupertinoPageRoute(
+                            fullscreenDialog: false,
+                            builder: (context) => const DrawPage(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.palette, color: CupertinoColors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            '그림그리기',
+                            style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
