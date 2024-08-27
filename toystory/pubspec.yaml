@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^2.1.4
   url_launcher: ^6.3.0
   http_parser: ^4.0.2
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.9.2
@@ -86,12 +87,22 @@ flutter:
     - assets/glb/
     - assets/logo/
     - assets/obj/
+    - assets/sounds/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   fonts:
     - family: crayon
       fonts:
         - asset: assets/fonts/Typo_CrayonM.ttf
+    - family: crayon2
+      fonts:
+        - asset: assets/fonts/SSShinb7Regular.ttf
+    - family: manse
+      fonts:
+        - asset: assets/fonts/manse.ttf
+    - family: cookierun
+      fonts:
+        - asset: assets/fonts/cookierun.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
