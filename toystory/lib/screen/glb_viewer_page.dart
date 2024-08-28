@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:toystory/widget/download_stl_dialog.dart';
-import 'package:toystory/services/stl_downloader.dart'; // URLLauncher 클래스를 import
-import 'package:toystory/services/api_service.dart'; // API Service import
+import 'package:toystory/services/stl_downloader.dart';
+import 'package:toystory/services/api_service.dart';
 
 class My3DModel extends StatefulWidget {
-  final int contentId; // contentId를 받는 필드 추가
+  final int contentId;
 
   const My3DModel({super.key, required this.contentId});
 
@@ -19,7 +19,7 @@ class _My3DModelState extends State<My3DModel> {
   String? modelUrlWithoutBackground;
   String? stlUrl;
   String? contentTitle;
-  bool showBackground = true; // 배경 표시 여부를 위한 상태 변수
+  bool showBackground = true;
 
   @override
   void initState() {
@@ -32,18 +32,16 @@ class _My3DModelState extends State<My3DModel> {
       final response =
           await ApiService().fetch3DItemDetails(contentId: widget.contentId);
       setState(() {
-        modelUrlWithBackground =
-            response['content_url_with_bg']; // 배경이 있는 GLB 파일
-        modelUrlWithoutBackground =
-            response['content_url_without_bg']; // 배경 없는 GLB 파일
         stlUrl = response['design_url'];
         contentTitle = response['content_title'];
+        modelUrlWithBackground = 'assets/glb/5.glb';
+        modelUrlWithoutBackground = 'assets/glb/5.glb';
       });
     } catch (e) {
       print('3D 모델 데이터 로드 실패: $e');
       setState(() {
-        modelUrlWithBackground = null;
-        modelUrlWithoutBackground = null;
+        modelUrlWithBackground = 'assets/glb/5.glb';
+        modelUrlWithoutBackground = 'assets/glb/5.glb';
       });
     }
   }
@@ -56,10 +54,15 @@ class _My3DModelState extends State<My3DModel> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
+        //backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
+        backgroundColor: CupertinoColors.transparent,
         middle: Text(
           contentTitle ?? 'Loading...',
-          style: const TextStyle(color: CupertinoColors.white),
+          style: const TextStyle(
+            color: CupertinoColors.systemIndigo,
+            fontFamily: 'cookierun',
+            fontSize: 28, // 텍스트 크기 증가
+          ),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -67,7 +70,8 @@ class _My3DModelState extends State<My3DModel> {
           },
           child: const Icon(
             CupertinoIcons.back,
-            color: CupertinoColors.white,
+            color: CupertinoColors.systemIndigo,
+            size: 40, // 아이콘 크기 증가
           ),
         ),
       ),
@@ -85,7 +89,13 @@ class _My3DModelState extends State<My3DModel> {
                   disableZoom: false,
                 )
               : const Center(
-                  child: Text('3D 모델을 불러올 수 없습니다.'),
+                  child: Text(
+                    '3D 모델을 불러올 수 없습니다.',
+                    style: TextStyle(
+                      fontFamily: 'cookierun',
+                      fontSize: 22, // 폰트 크기 증가
+                    ),
+                  ),
                 ),
           Positioned(
             bottom: 80, // 세그먼트 컨트롤러 위에 배치되도록 버튼을 위로 이동
@@ -113,13 +123,14 @@ class _My3DModelState extends State<My3DModel> {
                 mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(CupertinoIcons.cloud_download,
-                      color: CupertinoColors.white),
+                      color: CupertinoColors.white, size: 24), // 아이콘 크기 증가
                   SizedBox(width: 8),
                   Text(
                     '3D 프린트용 파일 다운로드',
                     style: TextStyle(
                       color: CupertinoColors.white,
-                      fontSize: 16,
+                      fontSize: 20, // 텍스트 크기 증가
+                      fontFamily: 'cookierun',
                     ),
                   ),
                 ],
@@ -132,8 +143,20 @@ class _My3DModelState extends State<My3DModel> {
             right: 30,
             child: CupertinoSegmentedControl<bool>(
               children: const {
-                true: Text('배경 있음'),
-                false: Text('배경 없음'),
+                true: Text(
+                  '배경 있음',
+                  style: TextStyle(
+                    fontFamily: 'cookierun',
+                    fontSize: 26, // 텍스트 크기 증가
+                  ),
+                ),
+                false: Text(
+                  '배경 없음',
+                  style: TextStyle(
+                    fontFamily: 'cookierun',
+                    fontSize: 26, // 텍스트 크기 증가
+                  ),
+                ),
               },
               onValueChanged: (bool value) {
                 setState(() {
@@ -141,9 +164,9 @@ class _My3DModelState extends State<My3DModel> {
                 });
               },
               groupValue: showBackground,
-              selectedColor: CupertinoColors.systemIndigo, // 선택된 색상 설정
-              unselectedColor: CupertinoColors.white, // 선택되지 않은 색상 설정
-              borderColor: CupertinoColors.systemIndigo, // 테두리 색상 설정
+              selectedColor: CupertinoColors.systemIndigo,
+              unselectedColor: CupertinoColors.white,
+              borderColor: CupertinoColors.systemIndigo,
             ),
           ),
         ],
