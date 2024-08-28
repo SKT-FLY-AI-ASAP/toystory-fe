@@ -85,24 +85,28 @@ class _SketchListViewState extends State<SketchListView> {
           Row(
             // mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우 배치
             children: [
-              Text(
-                '$nickname의 스케치북',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: CupertinoColors.systemIndigo,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'cookierun',
+              SizedBox(
+                width: 280, // 원하는 너비 설정
+                child: Text(
+                  '$nickname의 스케치북',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: CupertinoColors.systemIndigo,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'cookierun',
+                  ),
+                  overflow: TextOverflow.ellipsis, // 텍스트가 너무 길 경우 생략표시(...)
                 ),
               ),
               SizedBox(width: 30),
               // 프로그레스바를 SizedBox로 감싸서 크기 지정
               SizedBox(
-                width: 380, // 너비 설정
+                width: 350, // 너비 설정
                 height: 30, // 높이 설정
                 child: GFProgressBar(
                   percentage: progressPercent, // 다음 레벨까지 남은 진행률
                   lineHeight: 25,
-                  width: 200,
+                  width: 170,
                   alignment: MainAxisAlignment.spaceBetween,
                   backgroundColor: CupertinoColors.systemGrey4,
                   progressBarColor: CupertinoColors.systemIndigo,

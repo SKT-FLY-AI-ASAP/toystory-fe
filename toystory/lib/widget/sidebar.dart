@@ -4,6 +4,7 @@ import 'magic_dialog.dart';
 import 'package:toystory/screen/draw_page.dart';
 import 'package:toystory/services/api_service.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:toystory/widget/settings_button.dart';
 
 class Sidebar extends StatefulWidget {
   final Function(bool) onBGMChanged;
@@ -68,16 +69,23 @@ class _SidebarState extends State<Sidebar> {
         children: [
           const SizedBox(height: 20),
 
-          CupertinoButton(
-            onPressed: _toggleBGM,
-            padding: EdgeInsets.zero,
-            child: Icon(
-              _isBGMPlaying
-                  ? CupertinoIcons.speaker_2_fill
-                  : CupertinoIcons.speaker_slash_fill,
-              size: 30,
-              color: CupertinoColors.systemIndigo,
-            ),
+          Row(
+            // mainAxisAlignment:
+            //     MainAxisAlignment.spaceBetween, // Align the buttons properly
+            children: [
+              CupertinoButton(
+                onPressed: _toggleBGM,
+                padding: EdgeInsets.zero,
+                child: Icon(
+                  _isBGMPlaying
+                      ? CupertinoIcons.speaker_2_fill
+                      : CupertinoIcons.speaker_slash_fill,
+                  size: 30,
+                  color: CupertinoColors.systemIndigo,
+                ),
+              ),
+              SettingsButton()
+            ],
           ),
 
           //const SizedBox(height: 10),
@@ -122,7 +130,7 @@ class _SidebarState extends State<Sidebar> {
                   .navTitleTextStyle
                   .copyWith(
                     fontSize: 30,
-                    color: CupertinoColors.systemIndigo,
+                    color: CupertinoColors.systemIndigo.withOpacity(0.7),
                     fontFamily: 'cookierun',
                   ),
               textAlign: TextAlign.center,
