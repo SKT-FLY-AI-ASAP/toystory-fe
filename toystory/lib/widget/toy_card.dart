@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart'; // 오디오 플레이어 패키지 추가
 import 'package:toystory/screen/glb_viewer_page.dart'; // My3DModel 페이지 임포트
 
 class ToyCard extends StatelessWidget {
@@ -15,12 +16,21 @@ class ToyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AudioPlayer _audioPlayer = AudioPlayer(); // 오디오 플레이어 초기화
+
     return SizedBox(
-      width: 250, // 정사각형 크기 설정
-      height: 250, // 정사각형 크기 설정
+      width: 250, // 카드의 너비
+      height: 250, // 카드의 높이
       child: CupertinoButton(
-        onPressed: () {
-          // contentId를 My3DModel에 전달하여 3D 뷰어로 이동
+        onPressed: () async {
+          // 효과음 재생
+          try {
+            await _audioPlayer.play(AssetSource('sounds/boing.mp3'));
+          } catch (e) {
+            print('Error playing sound: $e');
+          }
+
+          // 효과음이 재생된 후 3D 뷰어로 이동
           Navigator.push(
             context,
             CupertinoPageRoute(
@@ -31,7 +41,7 @@ class ToyCard extends StatelessWidget {
           );
         },
         child: Card(
-          elevation: 4,
+          elevation: 6,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -41,33 +51,43 @@ class ToyCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 원격 이미지를 로드하는 부분
-                SizedBox(
-                  height: 200, // 원하는 이미지의 고정 높이
-                  width: 200, // 원하는 이미지의 고정 너비
-                  child: Image.network(
-                    toyUrl,
-                    fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.white, // 이미지 로드 실패 시 흰색 네모를 표시
-                        child: Center(
-                          child: Text(
-                            '이미지 불러오기 실패',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
+                Flexible(
+                  flex: 5,
+                  child: SizedBox(
+                    height: 200,
+                    width: 200, // 원하는 이미지의 고정 너비
+                    child: Image.network(
+                      toyUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.white, // 이미지 로드 실패 시 흰색 네모를 표시
+                          child: Center(
+                            child: Text(
+                              '이미지 불러오기 실패',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
-                  toyTitle,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                const SizedBox(height: 10),
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    toyTitle,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 22, // 폰트 크기를 더 크게 설정
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.systemIndigo,
+                        fontFamily: 'cookierun'),
+                  ),
                 ),
               ],
             ),

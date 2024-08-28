@@ -247,7 +247,7 @@ class _SignUpScreenState extends State<SignUpPage> {
                             },
                             child: const Icon(
                               CupertinoIcons.back,
-                              color: CupertinoColors.activeBlue,
+                              color: CupertinoColors.systemIndigo,
                               size: 20,
                             ),
                           ),
@@ -292,7 +292,7 @@ class _SignUpScreenState extends State<SignUpPage> {
                       '인증',
                       style: TextStyle(
                         fontSize: 14,
-                        color: CupertinoColors.activeBlue,
+                        color: CupertinoColors.systemIndigo,
                       ),
                     ),
                   ),
@@ -334,7 +334,7 @@ class _SignUpScreenState extends State<SignUpPage> {
                       '중복확인',
                       style: TextStyle(
                         fontSize: 14,
-                        color: CupertinoColors.activeBlue,
+                        color: CupertinoColors.systemIndigo,
                       ),
                     ),
                   ),

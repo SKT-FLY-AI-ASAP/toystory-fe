@@ -2,11 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:toystory/widget/download_stl_dialog.dart';
-import 'package:toystory/services/stl_downloader.dart'; // URLLauncher 클래스를 import
-import 'package:toystory/services/api_service.dart'; // API Service import
+import 'package:toystory/services/stl_downloader.dart';
+import 'package:toystory/services/api_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class My3DModel extends StatefulWidget {
-  final int contentId; // contentId를 받는 필드 추가
+  final int contentId;
 
   const My3DModel({super.key, required this.contentId});
 
@@ -15,65 +16,120 @@ class My3DModel extends StatefulWidget {
 }
 
 class _My3DModelState extends State<My3DModel> {
-  String? modelUrl; // GLB 파일의 URL을 저장하는 변수
-  String? stlUrl; // STL 파일의 URL을 저장하는 변수
-  String? contentTitle; // 모델의 제목을 저장하는 변수
+  String? modelUrl;
+  String? stlUrl;
+  String? contentTitle;
+  String? backgroundUrl; // 배경 이미지 URL
+  String? backgroundMusicUrl; // 배경 음악 URL
+  late AudioPlayer _audioPlayer;
+  bool isPlaying = false; // 배경 음악 재생 상태
 
   @override
   void initState() {
     super.initState();
-    fetch3DModelData(); // 초기화 시 3D 모델 데이터를 가져옴
+    _audioPlayer = AudioPlayer(); // 오디오 플레이어 초기화
+    fetch3DModelData();
   }
 
-  // 3D 모델 데이터를 API에서 받아오는 함수
   Future<void> fetch3DModelData() async {
     try {
       final response =
           await ApiService().fetch3DItemDetails(contentId: widget.contentId);
       setState(() {
-        modelUrl = response['content_url']; // 모델의 GLB URL
-        stlUrl = response['design_url']; // STL 파일의 다운로드 URL
-        contentTitle = response['content_title']; // 모델의 제목
+        stlUrl = response['design_url'];
+        contentTitle = response['content_title'];
+        modelUrl = 'assets/glb/5.glb'; // 하나의 GLB 파일만 사용
+        backgroundUrl = response['background_image_url']; // 배경 이미지 URL 설정
+        backgroundMusicUrl = response['background_music_url']; // 배경 음악 URL 설정
       });
+      playBackgroundMusic(); // 배경 음악 재생
     } catch (e) {
       print('3D 모델 데이터 로드 실패: $e');
+      setState(() {
+        modelUrl = 'assets/glb/5.glb'; // 로드 실패 시 기본 파일 사용
+      });
     }
+  }
+
+  // 배경 음악 재생 함수
+  Future<void> playBackgroundMusic() async {
+    if (backgroundMusicUrl != null && backgroundMusicUrl!.isNotEmpty) {
+      await _audioPlayer.play(
+        UrlSource(backgroundMusicUrl!), // API에서 받은 배경음악 파일 URL로 재생
+      );
+      setState(() {
+        isPlaying = true; // 배경 음악이 재생 중임을 표시
+      });
+    }
+  }
+
+  // 배경 음악 정지 함수
+  Future<void> stopBackgroundMusic() async {
+    await _audioPlayer.stop();
+    setState(() {
+      isPlaying = false; // 배경 음악이 정지됨을 표시
+    });
+  }
+
+  // 배경 음악 On/Off 토글 함수
+  void toggleBgm() {
+    if (isPlaying) {
+      stopBackgroundMusic();
+    } else {
+      playBackgroundMusic();
+    }
+  }
+
+  @override
+  void dispose() {
+    stopBackgroundMusic(); // 페이지 벗어날 때 배경 음악 정지
+    _audioPlayer.dispose(); // 오디오 플레이어 리소스 해제
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
+        backgroundColor: CupertinoColors.transparent,
         middle: Text(
           contentTitle ?? 'Loading...',
-          style: const TextStyle(color: CupertinoColors.white),
-        ), // 모델 제목 표시
+          style: const TextStyle(
+            color: CupertinoColors.systemIndigo,
+            fontFamily: 'cookierun',
+            fontSize: 28, // 텍스트 크기 증가
+          ),
+        ),
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
           child: const Icon(
             CupertinoIcons.back,
-            color: CupertinoColors.white, // 뒤로가기 버튼 색상 변경
+            color: CupertinoColors.systemIndigo,
+            size: 40, // 아이콘 크기 증가
           ),
         ),
       ),
       child: Stack(
         children: [
-          // 배경 이미지
-          Positioned.fill(
-            child: Image.asset(
-              'assets/img/design/toystory_loading.gif', // 배경 이미지 경로
-              fit: BoxFit.cover, // 이미지가 전체 화면을 덮도록 설정
+          // 배경 이미지 설정
+          if (backgroundUrl != null && backgroundUrl!.isNotEmpty)
+            Positioned.fill(
+              child: Image.network(
+                backgroundUrl!,
+                fit: BoxFit.cover,
+              ),
+            )
+          else
+            Container(
+              color: Colors.white, // 기본 배경색 설정
             ),
-          ),
-          // 모델 뷰어
-          modelUrl != null
+          modelUrl != null && modelUrl!.isNotEmpty
               ? ModelViewer(
-                  backgroundColor: Colors.transparent, // 배경 투명 설정
-                  src: modelUrl!, // 동적으로 받아온 모델 URL 적용
-                  alt: contentTitle ?? 'A 3D model of a toy', // 모델 제목 표시
+                  backgroundColor: Colors.transparent,
+                  src: modelUrl!,
+                  alt: contentTitle ?? 'A 3D model of a toy',
                   ar: true,
                   autoRotate: true,
                   iosSrc:
@@ -81,11 +137,16 @@ class _My3DModelState extends State<My3DModel> {
                   disableZoom: false,
                 )
               : const Center(
-                  child: CupertinoActivityIndicator(),
+                  child: Text(
+                    '3D 모델을 불러올 수 없습니다.',
+                    style: TextStyle(
+                      fontFamily: 'cookierun',
+                      fontSize: 22, // 폰트 크기 증가
+                    ),
+                  ),
                 ),
-          // Floating Action Button
           Positioned(
-            bottom: 30,
+            bottom: 80,
             right: 30,
             child: CupertinoButton(
               color: CupertinoColors.systemIndigo,
@@ -95,31 +156,66 @@ class _My3DModelState extends State<My3DModel> {
               ),
               borderRadius: BorderRadius.circular(30),
               onPressed: () async {
-                // STL 파일 다운로드 확인 다이얼로그 표시
                 final result = await showCupertinoDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
-                    return const DownloadSTLDialog(); // 다운로드 확인을 위한 커스텀 다이얼로그
+                    return const DownloadSTLDialog();
                   },
                 );
 
                 if (result == true && stlUrl != null) {
-                  // STL 파일 다운로드 시작
-                  await URLLauncher.openURL(
-                      context, stlUrl!); // Safari로 STL 파일 다운로드 URL 열기
+                  await URLLauncher.openURL(context, stlUrl!);
                 }
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(CupertinoIcons.cloud_download,
-                      color: CupertinoColors.white), // 다운로드 아이콘 추가
+                      color: CupertinoColors.white, size: 24),
                   SizedBox(width: 8),
                   Text(
                     '3D 프린트용 파일 다운로드',
                     style: TextStyle(
                       color: CupertinoColors.white,
-                      fontSize: 16,
+                      fontSize: 20,
+                      fontFamily: 'cookierun',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // BGM On/Off 버튼 추가
+          Positioned(
+            bottom: 150,
+            right: 30,
+            child: CupertinoButton(
+              color: isPlaying
+                  ? CupertinoColors.systemRed
+                  : CupertinoColors.systemGreen,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              borderRadius: BorderRadius.circular(30),
+              onPressed: toggleBgm,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isPlaying
+                        ? CupertinoIcons.pause
+                        : CupertinoIcons.play_arrow_solid,
+                    color: CupertinoColors.white,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isPlaying ? 'BGM 끄기' : 'BGM 켜기',
+                    style: const TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 20,
+                      fontFamily: 'cookierun',
                     ),
                   ),
                 ],

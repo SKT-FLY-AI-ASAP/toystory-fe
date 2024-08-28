@@ -56,7 +56,7 @@ class SettingsButton extends StatelessWidget {
                 Navigator.pop(context);
                 showTermsDialog(context);
               },
-              child: Text('약관 조회'),
+              child: Text('사용 안내'),
             ),
             CupertinoDialogAction(
               onPressed: () {

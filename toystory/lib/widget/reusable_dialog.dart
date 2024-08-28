@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class ReusableDialog extends StatelessWidget {
   final String title;
@@ -29,9 +30,10 @@ class ReusableDialog extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'SF Pro Display', // Font family
+                    fontSize: 25,
+                    //fontWeight: FontWeight.bold,
+                    fontFamily: 'cookierun', // Font family
+                    color: CupertinoColors.systemIndigo, // Text color
                   ),
                 ),
                 const Divider(
@@ -43,9 +45,8 @@ class ReusableDialog extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: DefaultTextStyle(
                       style: const TextStyle(
-                        fontFamily:
-                            'SF Pro Display', // Default font for content
-                      ),
+                          //fontFamily: 'crayon', // Default font for content
+                          ),
                       child: content,
                     ),
                   ),
