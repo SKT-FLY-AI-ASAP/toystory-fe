@@ -42,8 +42,24 @@ class _LoginPageState extends State<LoginPage> {
       await _apiService.login(email: email, password: password);
       Navigator.pushReplacement(
         context,
-        CupertinoPageRoute(
-          builder: (context) => HomePage(),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = 0.0;
+            const end = 1.0;
+            const curve = Curves.easeInOut;
+
+            final tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            final fadeAnimation = animation.drive(tween);
+
+            return FadeTransition(
+              opacity: fadeAnimation,
+              child: child,
+            );
+          },
+          transitionDuration:
+              const Duration(milliseconds: 500), // 부드러운 전환 시간 설정
         ),
       );
     } catch (e) {
@@ -203,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                             (context, animation, secondaryAnimation, child) {
                           const begin = 0.0;
                           const end = 1.0;
-                          const curve = Curves.ease;
+                          const curve = Curves.easeInOut;
 
                           final tween = Tween(begin: begin, end: end);
                           final curvedAnimation = CurvedAnimation(
