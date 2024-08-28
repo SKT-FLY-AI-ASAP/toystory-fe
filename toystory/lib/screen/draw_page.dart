@@ -2,11 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
-import 'home_page.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:toystory/services/api_service.dart';
+import 'package:toystory/widget/title_input_dialog.dart';
+import 'package:toystory/services/api_service.dart'; // Your API service
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'home_page.dart';
 
 class DrawPage extends StatefulWidget {
   const DrawPage({super.key});
@@ -17,18 +18,12 @@ class DrawPage extends StatefulWidget {
 
 class _DrawPageState extends State<DrawPage> {
   late ScribbleNotifier notifier;
-  final TextEditingController _titleController = TextEditingController();
+  String _title = ""; // Title entered by the user
 
   @override
   void initState() {
-    notifier = ScribbleNotifier();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    super.dispose();
+    notifier = ScribbleNotifier();
   }
 
   @override
@@ -37,12 +32,12 @@ class _DrawPageState extends State<DrawPage> {
       backgroundColor: CupertinoColors.systemGrey6,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: const Color.fromARGB(18, 54, 23, 206),
-        middle: SizedBox(
-          width: 200,
-          child: CupertinoTextField(
-            controller: _titleController,
-            placeholder: "제목을 입력하세요",
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        middle: const Text(
+          '너만의 상상을 펼쳐봐!',
+          style: TextStyle(
+            fontFamily: 'cookierun',
+            color: CupertinoColors.systemIndigo,
+            fontSize: 22.0,
           ),
         ),
         trailing: Row(
@@ -111,122 +106,146 @@ class _DrawPageState extends State<DrawPage> {
       ),
       CupertinoButton(
         padding: EdgeInsets.zero,
-        onPressed: () async {
-          // 저장 여부를 물어보는 다이얼로그 표시
-          final shouldSave = await showCupertinoDialog<bool>(
-            context: context,
-            builder: (BuildContext context) {
-              return CupertinoAlertDialog(
-                title: const Text('저장 확인'),
-                content: const Text('스케치를 저장하시겠습니까?'),
-                actions: [
-                  CupertinoDialogAction(
-                    child: const Text('저장'),
-                    isDefaultAction: true,
-                    onPressed: () {
-                      Navigator.of(context).pop(true); // 저장 -> true 반환
-                    },
-                  ),
-                  CupertinoDialogAction(
-                    child: const Text('취소'),
-                    onPressed: () {
-                      Navigator.of(context).pop(false); // 취소 -> false 반환
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-
-          if (shouldSave == true) {
-            // "저장 중" 다이얼로그 표시
-            showCupertinoDialog(
-              context: context,
-              barrierDismissible: false, // 다른 곳을 클릭해도 다이얼로그가 닫히지 않음
-              builder: (BuildContext context) {
-                return CupertinoAlertDialog(
-                  title: const Text('저장 중...'),
-                  content: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: CupertinoActivityIndicator(radius: 15),
-                  ),
-                );
-              },
-            );
-
-            // 이미지 생성 및 저장 작업
-            final ByteData? imageData = await notifier.renderImage();
-            if (imageData != null) {
-              final Uint8List imageBytes = imageData.buffer.asUint8List();
-              final savedFile = await _saveImageToFile(imageBytes);
-
-              if (savedFile != null) {
-                try {
-                  await ApiService().createSketchbook(
-                    title: _titleController.text,
-                    file: savedFile,
-                  );
-
-                  // "저장 중" 다이얼로그 닫기
-                  Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
-
-                  // 저장 성공 메시지 표시 및 HomePage로 이동
-                  showCupertinoDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return CupertinoAlertDialog(
-                        title: const Text('저장 성공'),
-                        content: const Text('스케치북이 성공적으로 생성되었습니다.'),
-                        actions: [
-                          CupertinoDialogAction(
-                            child: const Text('확인'),
-                            onPressed: () {
-                              Navigator.of(context).pop(); // 다이얼로그 닫기
-                              // HomePage로 이동
-                              Navigator.pushReplacement(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => HomePage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } catch (e) {
-                  // 저장 중 다이얼로그 닫기
-                  Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
-                  print(e);
-                }
-              }
-            } else {
-              // 저장 중 다이얼로그 닫기
-              Navigator.of(context).pop(); // 저장 중 다이얼로그 닫기
-            }
-          }
-        },
-        child: const Icon(CupertinoIcons.cloud_upload,
-            color: CupertinoColors.systemIndigo),
+        onPressed: _handleTitleInput, // Handle title input button press
+        child: Text(
+          '제목 입력 및 저장',
+          style: TextStyle(
+              color: CupertinoColors.systemIndigo,
+              fontFamily: 'cookierun',
+              fontWeight: FontWeight.bold),
+        ),
       ),
     ];
+  }
+
+  Future<void> _handleTitleInput() async {
+    // Show TitleInputDialog and handle the title input
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TitleInputDialog(
+          onTitleSaved: (result) {
+            setState(() {
+              _title = result; // Save title
+            });
+            Navigator.of(context).pop(); // Close the dialog
+            _saveSketch(); // Save the sketch after title is set
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _saveSketch() async {
+    // Show "Saving" dialog
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const CupertinoAlertDialog(
+          title: Text('저장 중...'),
+          content: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: CupertinoActivityIndicator(radius: 15),
+          ),
+        );
+      },
+    );
+
+    // Render the image from Scribble
+    final ByteData? imageData = await notifier.renderImage();
+    if (imageData != null) {
+      final Uint8List imageBytes = imageData.buffer.asUint8List();
+      final savedFile = await _saveImageToFile(imageBytes);
+
+      if (savedFile != null) {
+        try {
+          // Call the API to create the sketchbook with title and image
+          await ApiService().createSketchbook(
+            title: _title,
+            file: savedFile,
+          );
+
+          Navigator.of(context).pop(); // Close the saving dialog
+
+          // Show success dialog
+          await _showSaveSuccessDialog();
+        } catch (e) {
+          Navigator.of(context).pop(); // Close the saving dialog
+          // Show failure dialog
+          await _showSaveFailureDialog();
+          print("Error during saving: $e");
+        }
+      }
+    } else {
+      Navigator.of(context).pop(); // Close the saving dialog
+      await _showSaveFailureDialog(); // Show failure dialog
+      print("Error: Failed to render the image.");
+    }
   }
 
   Future<File?> _saveImageToFile(Uint8List imageBytes) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/sketchbook.png';
+      final filePath =
+          '${directory.path}/sketchbook_${DateTime.now().millisecondsSinceEpoch}.png';
       final file = File(filePath);
 
       await file.writeAsBytes(imageBytes);
-      print('이미지 파일로 저장됨: $filePath');
       return file;
     } catch (e) {
       print('이미지 파일 저장 실패: $e');
       return null;
     }
   }
+
+  Future<void> _showSaveSuccessDialog() async {
+    await showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text('저장 성공'),
+          content: const Text('스케치북이 성공적으로 생성되었습니다.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushReplacement(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => HomePage(), // Navigate to HomePage
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSaveFailureDialog() async {
+    await showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text('저장 실패'),
+          content: const Text('스케치북 저장에 실패하였습니다. 다시 시도해주세요.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  ///////////////////////////
 
   Widget _buildStrokeToolbar(BuildContext context) {
     return ValueListenableBuilder<ScribbleState>(
@@ -265,15 +284,16 @@ class _DrawPageState extends State<DrawPage> {
             width: strokeWidth * 2,
             height: strokeWidth * 2,
             decoration: BoxDecoration(
-                color: state.map(
-                  drawing: (s) => Color(s.selectedColor),
-                  erasing: (_) => Colors.transparent,
-                ),
-                border: state.map(
-                  drawing: (_) => null,
-                  erasing: (_) => Border.all(width: 1),
-                ),
-                borderRadius: BorderRadius.circular(50.0)),
+              color: state.map(
+                drawing: (s) => Color(s.selectedColor),
+                erasing: (_) => Colors.transparent,
+              ),
+              border: state.map(
+                drawing: (_) => null,
+                erasing: (_) => Border.all(width: 1),
+              ),
+              borderRadius: BorderRadius.circular(50.0),
+            ),
           ),
         ),
       ),
@@ -307,33 +327,34 @@ class _DrawPageState extends State<DrawPage> {
         outlineColor: Colors.black,
         isActive: isErasing,
         onPressed: () => notifier.setEraser(),
-        child: const Icon(Icons.cleaning_services,
-            color: CupertinoColors.systemIndigo),
+        child: const Icon(
+          Icons.cleaning_services,
+          color: CupertinoColors.systemIndigo,
+        ),
       ),
     );
   }
 
   Widget _buildPointerModeSwitcher(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: notifier.select(
-          (value) => value.allowedPointersMode,
-        ),
-        builder: (context, value, child) {
-          return CupertinoSegmentedControl<ScribblePointerMode>(
-            groupValue: value,
-            onValueChanged: (v) => notifier.setAllowedPointersMode(v),
-            children: const {
-              ScribblePointerMode.all: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(CupertinoIcons.hand_draw),
-              ),
-              ScribblePointerMode.penOnly: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(CupertinoIcons.pencil),
-              ),
-            },
-          );
-        });
+      valueListenable: notifier.select((value) => value.allowedPointersMode),
+      builder: (context, value, child) {
+        return CupertinoSegmentedControl<ScribblePointerMode>(
+          groupValue: value,
+          onValueChanged: (v) => notifier.setAllowedPointersMode(v),
+          children: const {
+            ScribblePointerMode.all: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Icon(CupertinoIcons.hand_draw),
+            ),
+            ScribblePointerMode.penOnly: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Icon(CupertinoIcons.pencil),
+            ),
+          },
+        );
+      },
+    );
   }
 
   Widget _buildColorButton(
