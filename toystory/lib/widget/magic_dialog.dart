@@ -62,13 +62,13 @@ class _MagicDialogState extends State<MagicDialog> {
         barrierDismissible: false, // 다이얼로그 밖을 클릭해도 닫히지 않게
         builder: (context) {
           return CupertinoAlertDialog(
-            title: const Text('3D 변환중'),
+            title: const Text('장난감이 만들어지는 중 ...'),
             content: Column(
               children: const [
                 SizedBox(height: 16),
                 CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
                 SizedBox(height: 16),
-                Text('3D 변환 중입니다...'),
+                Text('장난감을 만들고 있어 \n 조금만 기다려줘'),
               ],
             ),
           );
@@ -91,8 +91,8 @@ class _MagicDialogState extends State<MagicDialog> {
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
-            title: const Text('3D 변환 성공'),
-            content: const Text('장난감 변환이 완료되었습니다!'),
+            title: const Text('장난감 만들기 성공'),
+            content: const Text('장난감이 다 만들어졌어 \n 장난감 상자에서 확인해봐!'),
             actions: [
               CupertinoDialogAction(
                 child: const Text('확인'),
@@ -113,8 +113,8 @@ class _MagicDialogState extends State<MagicDialog> {
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
-            title: const Text('3D 변환 실패'),
-            content: const Text('장난감 변환에 실패했습니다. 다시 시도해주세요.'),
+            title: const Text('장난감 만들기 실패'),
+            content: const Text('장난감 만들기에 실패했어 \n 다시 시도해봐!'),
             actions: [
               CupertinoDialogAction(
                 child: const Text('확인'),
@@ -132,78 +132,111 @@ class _MagicDialogState extends State<MagicDialog> {
   @override
   Widget build(BuildContext context) {
     return ReusableDialog(
-      title: '주문 외우기',
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            '무한한 공간 저 너머로 주문을 전달하는 중 ...',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: CupertinoColors.black,
-            ),
+      title: '무한한 공간 저 너머로 주문을 전달하는 중...',
+      content: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/img/design/magic_bg.png'), // 배경 이미지 경로 설정
+            fit: BoxFit.contain, // 이미지가 꽉 차도록 설정
           ),
-          const SizedBox(height: 20),
-          Container(
-            width: 500,
-            height: 100,
-            color: CupertinoColors.white,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              _recognizedText,
-              style: const TextStyle(
-                color: CupertinoColors.black,
-                fontSize: 18,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 20),
-          GestureDetector(
-            onTap: _toggleListening,
-            child: Icon(
-              _isListening
-                  ? CupertinoIcons.stop_circle
-                  : CupertinoIcons.mic_circle,
-              size: 70,
-              color: CupertinoColors.systemIndigo,
-            ),
-          ),
-          const SizedBox(height: 20),
-          if (!_isListening && _finalRecognizedText.isNotEmpty)
-            // 녹음이 끝나면 최종 텍스트를 표시
-            Text(
-              '최종 녹음된 텍스트: $_finalRecognizedText',
-              style: const TextStyle(
-                fontSize: 18,
-                color: CupertinoColors.systemGrey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          const SizedBox(height: 20),
-          // 제목 입력 필드 추가
-          CupertinoTextField(
-            controller: _titleController,
-            placeholder: "제목을 입력하세요",
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          ),
-          const SizedBox(height: 20),
-          CupertinoButton(
-            color: CupertinoColors.systemIndigo, // 배경 색 지정
-            onPressed: () {
-              // 그림 만들기 API 호출
-              _createToy(context);
-            },
-            child: const Text(
-              '그림 만들기',
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              '네가 만들고 싶은 장난감이 뭐야?',
               style: TextStyle(
-                color: CupertinoColors.white, // 텍스트 색상도 설정 가능
+                fontSize: 24,
+                //fontWeight: FontWeight.bold,
+                color: CupertinoColors.black,
+                fontFamily: 'cookierun',
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 10),
+            const Text(
+              '말하는 대로 만들어줄게~',
+              style: TextStyle(
+                fontSize: 24,
+                //fontWeight: FontWeight.bold,
+                color: CupertinoColors.black,
+                fontFamily: 'cookierun',
+              ),
+            ),
+            Container(
+              width: 500,
+              height: 100,
+              color: CupertinoColors.transparent,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                _recognizedText,
+                style: const TextStyle(
+                  color: CupertinoColors.systemGrey,
+                  fontSize: 18,
+                  fontFamily: 'cookierun',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: _toggleListening,
+              child: Icon(
+                _isListening
+                    ? CupertinoIcons.stop_circle
+                    : CupertinoIcons.mic_circle,
+                size: 70,
+                color: CupertinoColors.systemIndigo,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (!_isListening && _finalRecognizedText.isNotEmpty)
+              Text(
+                '최종 주문: $_finalRecognizedText',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: CupertinoColors.systemIndigo,
+                  fontFamily: 'cookierun',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            const SizedBox(height: 50),
+            // 제목 입력 필드 추가
+            //Spacer(),
+            CupertinoTextField(
+              controller: _titleController,
+              placeholder: "장난감 이름",
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              prefix: const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Text(
+                  '장난감의 이름을 지어줘! ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: CupertinoColors.systemGrey,
+                    fontFamily: 'cookierun',
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            CupertinoButton(
+              color: CupertinoColors.systemIndigo, // 배경 색 지정
+              onPressed: () {
+                // 그림 만들기 API 호출
+                _createToy(context);
+              },
+              child: const Text(
+                '주문외우기',
+                style: TextStyle(
+                  color: CupertinoColors.white, // 텍스트 색상도 설정 가능
+                  fontFamily: 'cookierun',
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
