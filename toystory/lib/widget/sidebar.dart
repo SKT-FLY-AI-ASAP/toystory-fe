@@ -90,6 +90,7 @@ class _SidebarState extends State<Sidebar> {
 
           //const SizedBox(height: 10),
 
+//프로필 이미지가 아니라 toy list에서 랜덤으로 그냥 뽑는걸루 하자,,ㅌ
           // 원형 사진을 위한 CircleAvatar
           Center(
             child: CircleAvatar(
@@ -111,7 +112,7 @@ class _SidebarState extends State<Sidebar> {
                   .textTheme
                   .navTitleTextStyle
                   .copyWith(
-                    fontSize: 45,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: CupertinoColors.systemIndigo,
                     fontFamily: 'cookierun',
@@ -124,12 +125,12 @@ class _SidebarState extends State<Sidebar> {
           // 너만의 세상을 만들어볼래? 텍스트
           Center(
             child: Text(
-              '너만의 세상을             만들어볼래?',
+              '너만의 세상을\n만들어볼래?',
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
                   .copyWith(
-                    fontSize: 30,
+                    fontSize: 25,
                     color: CupertinoColors.systemIndigo.withOpacity(0.7),
                     fontFamily: 'cookierun',
                   ),

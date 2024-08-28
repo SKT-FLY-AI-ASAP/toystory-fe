@@ -138,38 +138,30 @@ class _ToyListViewState extends State<ToyListView> {
               Row(
                 children: [
                   SizedBox(
-                    width: 280, // 원하는 너비 설정
-                    child: Text(
-                      '$nickname의 장난감상자',
-                      style: TextStyle(
-                        fontSize: 30,
-                        color: CupertinoColors.systemIndigo,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'cookierun',
-                      ),
-                      overflow: TextOverflow.ellipsis, // 텍스트가 너무 길 경우 생략표시(...)
+                    width: 320, // 원하는 너비 설정
+                    child: Row(
+                      children: [
+                        Text(
+                          '$nickname의 장난감상자',
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: CupertinoColors.systemIndigo,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'cookierun',
+                          ),
+                          overflow:
+                              TextOverflow.ellipsis, // 텍스트가 너무 길 경우 생략표시(...)
+                        ),
+                        SizedBox(width: 10), // 텍스트와 아이콘 사이 간격
+                        Icon(
+                          CupertinoIcons.cube_box, // 원하는 아이콘 설정
+                          color: CupertinoColors.systemIndigo,
+                          size: 30, // 아이콘 크기 설정
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(width: 30), // 텍스트 간 간격
-                  // GestureDetector(
-                  //   onTap: () =>
-                  //       _showLevelInfoDialog(context), // 레벨 텍스트 터치 시 팝업 호출
-                  //   child: Row(
-                  //     children: [
-                  //       Text(
-                  //         '레벨 $userLevel', // 레벨을 표시
-                  //         style: TextStyle(
-                  //           fontSize: 24,
-                  //           color: CupertinoColors.systemGrey,
-                  //           fontWeight: FontWeight.bold,
-                  //           fontFamily: 'cookierun',
-                  //         ),
-                  //       ),
-                  //       SizedBox(width: 10),
-                  //       _buildStars(userLevel), // 별 표시
-                  //     ],
-                  //   ),
-                  // ),
                   SizedBox(
                     width: 350, // 너비 설정
                     height: 30, // 높이 설정

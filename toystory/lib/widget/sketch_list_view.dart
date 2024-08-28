@@ -86,16 +86,26 @@ class _SketchListViewState extends State<SketchListView> {
             // mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우 배치
             children: [
               SizedBox(
-                width: 280, // 원하는 너비 설정
-                child: Text(
-                  '$nickname의 스케치북',
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: CupertinoColors.systemIndigo,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'cookierun',
-                  ),
-                  overflow: TextOverflow.ellipsis, // 텍스트가 너무 길 경우 생략표시(...)
+                width: 320, // 원하는 너비 설정
+                child: Row(
+                  children: [
+                    Text(
+                      '$nickname의 스케치북',
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: CupertinoColors.systemIndigo,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'cookierun',
+                      ),
+                      overflow: TextOverflow.ellipsis, // 텍스트가 너무 길 경우 생략표시(...)
+                    ),
+                    SizedBox(width: 10), // 텍스트와 아이콘 사이 간격 설정
+                    Icon(
+                      CupertinoIcons.book, // 원하는 아이콘 설정
+                      color: CupertinoColors.systemIndigo,
+                      size: 30, // 아이콘 크기 설정
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: 30),

@@ -4,6 +4,7 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:toystory/widget/download_stl_dialog.dart';
 import 'package:toystory/services/stl_downloader.dart';
 import 'package:toystory/services/api_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class My3DModel extends StatefulWidget {
   final int contentId;
@@ -15,15 +16,18 @@ class My3DModel extends StatefulWidget {
 }
 
 class _My3DModelState extends State<My3DModel> {
-  String? modelUrlWithBackground;
-  String? modelUrlWithoutBackground;
+  String? modelUrl;
   String? stlUrl;
   String? contentTitle;
-  bool showBackground = true;
+  String? backgroundUrl; // 배경 이미지 URL
+  String? backgroundMusicUrl; // 배경 음악 URL
+  late AudioPlayer _audioPlayer;
+  bool isPlaying = false; // 배경 음악 재생 상태
 
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer(); // 오디오 플레이어 초기화
     fetch3DModelData();
   }
 
@@ -34,27 +38,59 @@ class _My3DModelState extends State<My3DModel> {
       setState(() {
         stlUrl = response['design_url'];
         contentTitle = response['content_title'];
-        modelUrlWithBackground = 'assets/glb/5.glb';
-        modelUrlWithoutBackground = 'assets/glb/5.glb';
+        modelUrl = 'assets/glb/5.glb'; // 하나의 GLB 파일만 사용
+        backgroundUrl = response['background_image_url']; // 배경 이미지 URL 설정
+        backgroundMusicUrl = response['background_music_url']; // 배경 음악 URL 설정
       });
+      playBackgroundMusic(); // 배경 음악 재생
     } catch (e) {
       print('3D 모델 데이터 로드 실패: $e');
       setState(() {
-        modelUrlWithBackground = 'assets/glb/5.glb';
-        modelUrlWithoutBackground = 'assets/glb/5.glb';
+        modelUrl = 'assets/glb/5.glb'; // 로드 실패 시 기본 파일 사용
       });
     }
   }
 
+  // 배경 음악 재생 함수
+  Future<void> playBackgroundMusic() async {
+    if (backgroundMusicUrl != null && backgroundMusicUrl!.isNotEmpty) {
+      await _audioPlayer.play(
+        UrlSource(backgroundMusicUrl!), // API에서 받은 배경음악 파일 URL로 재생
+      );
+      setState(() {
+        isPlaying = true; // 배경 음악이 재생 중임을 표시
+      });
+    }
+  }
+
+  // 배경 음악 정지 함수
+  Future<void> stopBackgroundMusic() async {
+    await _audioPlayer.stop();
+    setState(() {
+      isPlaying = false; // 배경 음악이 정지됨을 표시
+    });
+  }
+
+  // 배경 음악 On/Off 토글 함수
+  void toggleBgm() {
+    if (isPlaying) {
+      stopBackgroundMusic();
+    } else {
+      playBackgroundMusic();
+    }
+  }
+
+  @override
+  void dispose() {
+    stopBackgroundMusic(); // 페이지 벗어날 때 배경 음악 정지
+    _audioPlayer.dispose(); // 오디오 플레이어 리소스 해제
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 배경 유무에 따라 해당하는 모델 URL을 선택
-    final modelUrl =
-        showBackground ? modelUrlWithBackground : modelUrlWithoutBackground;
-
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        //backgroundColor: CupertinoColors.systemIndigo.withOpacity(0.3),
         backgroundColor: CupertinoColors.transparent,
         middle: Text(
           contentTitle ?? 'Loading...',
@@ -77,6 +113,18 @@ class _My3DModelState extends State<My3DModel> {
       ),
       child: Stack(
         children: [
+          // 배경 이미지 설정
+          if (backgroundUrl != null && backgroundUrl!.isNotEmpty)
+            Positioned.fill(
+              child: Image.network(
+                backgroundUrl!,
+                fit: BoxFit.cover,
+              ),
+            )
+          else
+            Container(
+              color: Colors.white, // 기본 배경색 설정
+            ),
           modelUrl != null && modelUrl!.isNotEmpty
               ? ModelViewer(
                   backgroundColor: Colors.transparent,
@@ -98,7 +146,7 @@ class _My3DModelState extends State<My3DModel> {
                   ),
                 ),
           Positioned(
-            bottom: 80, // 세그먼트 컨트롤러 위에 배치되도록 버튼을 위로 이동
+            bottom: 80,
             right: 30,
             child: CupertinoButton(
               color: CupertinoColors.systemIndigo,
@@ -123,13 +171,13 @@ class _My3DModelState extends State<My3DModel> {
                 mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(CupertinoIcons.cloud_download,
-                      color: CupertinoColors.white, size: 24), // 아이콘 크기 증가
+                      color: CupertinoColors.white, size: 24),
                   SizedBox(width: 8),
                   Text(
                     '3D 프린트용 파일 다운로드',
                     style: TextStyle(
                       color: CupertinoColors.white,
-                      fontSize: 20, // 텍스트 크기 증가
+                      fontSize: 20,
                       fontFamily: 'cookierun',
                     ),
                   ),
@@ -137,36 +185,41 @@ class _My3DModelState extends State<My3DModel> {
               ),
             ),
           ),
+          // BGM On/Off 버튼 추가
           Positioned(
-            bottom: 30, // 하단에 세그먼트 컨트롤러 배치
-            left: 30,
+            bottom: 150,
             right: 30,
-            child: CupertinoSegmentedControl<bool>(
-              children: const {
-                true: Text(
-                  '배경 있음',
-                  style: TextStyle(
-                    fontFamily: 'cookierun',
-                    fontSize: 26, // 텍스트 크기 증가
+            child: CupertinoButton(
+              color: isPlaying
+                  ? CupertinoColors.systemRed
+                  : CupertinoColors.systemGreen,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              borderRadius: BorderRadius.circular(30),
+              onPressed: toggleBgm,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isPlaying
+                        ? CupertinoIcons.pause
+                        : CupertinoIcons.play_arrow_solid,
+                    color: CupertinoColors.white,
+                    size: 24,
                   ),
-                ),
-                false: Text(
-                  '배경 없음',
-                  style: TextStyle(
-                    fontFamily: 'cookierun',
-                    fontSize: 26, // 텍스트 크기 증가
+                  const SizedBox(width: 8),
+                  Text(
+                    isPlaying ? 'BGM 끄기' : 'BGM 켜기',
+                    style: const TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 20,
+                      fontFamily: 'cookierun',
+                    ),
                   ),
-                ),
-              },
-              onValueChanged: (bool value) {
-                setState(() {
-                  showBackground = value; // 사용자 선택에 따라 배경 상태 변경
-                });
-              },
-              groupValue: showBackground,
-              selectedColor: CupertinoColors.systemIndigo,
-              unselectedColor: CupertinoColors.white,
-              borderColor: CupertinoColors.systemIndigo,
+                ],
+              ),
             ),
           ),
         ],
