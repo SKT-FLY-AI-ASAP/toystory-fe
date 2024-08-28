@@ -25,11 +25,21 @@ class SketchViewer extends StatelessWidget {
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
-            title: const Text('3D 변환 성공'),
-            content: const Text('장난감 변환이 완료되었습니다!'),
+            title: const Text(
+              '장난감 만들기 완료',
+              style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
+            ),
+            content: const Text(
+              '장난감이 만들어졌어! \n 장난감 상자에서 확인해봐~',
+              style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
+            ),
             actions: [
               CupertinoDialogAction(
-                child: const Text('확인'),
+                child: const Text(
+                  '확인',
+                  style:
+                      TextStyle(fontSize: 20, fontFamily: 'cookierun'), // 폰트 변경
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -45,11 +55,21 @@ class SketchViewer extends StatelessWidget {
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
-            title: const Text('3D 변환 실패'),
-            content: const Text('장난감 변환에 실패했습니다. 다시 시도해주세요.'),
+            title: const Text(
+              '장난감 만들기 실패',
+              style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
+            ),
+            content: const Text(
+              '장난감 만들기에 실패했어. \n 다시 시도해봐',
+              style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
+            ),
             actions: [
               CupertinoDialogAction(
-                child: const Text('확인'),
+                child: const Text(
+                  '확인',
+                  style:
+                      TextStyle(fontSize: 20, fontFamily: 'cookierun'), // 폰트 변경
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -65,17 +85,21 @@ class SketchViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor:
-            CupertinoColors.systemIndigo.withOpacity(0.3), // 네비게이션 바 색상 변경
+        backgroundColor: CupertinoColors.transparent, // 네비게이션 바 색상
         middle: Text(
           title,
-          style: TextStyle(color: CupertinoColors.white), // 텍스트 색상 변경
+          style: const TextStyle(
+            color: CupertinoColors.systemIndigo,
+            fontSize: 32, // 제목 텍스트 크기 증가
+            fontFamily: 'cookierun', // 폰트 변경
+          ),
         ),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(
+          child: const Icon(
             CupertinoIcons.back,
-            color: CupertinoColors.white, // 뒤로가기 버튼 색상 변경
+            color: CupertinoColors.systemIndigo, // 뒤로가기 버튼 색상
+            size: 40, // 아이콘 크기 증가
           ),
           onPressed: () {
             Navigator.pop(context); // 뒤로 가기
@@ -101,8 +125,8 @@ class SketchViewer extends StatelessWidget {
             child: CupertinoButton(
               color: CupertinoColors.systemIndigo,
               padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
+                horizontal: 24, // 버튼 패딩 확대
+                vertical: 14, // 버튼 패딩 확대
               ),
               borderRadius: BorderRadius.circular(30),
               onPressed: () async {
@@ -120,13 +144,22 @@ class SketchViewer extends StatelessWidget {
                     barrierDismissible: false, // 다이얼로그 밖을 클릭해도 닫히지 않게
                     builder: (context) {
                       return CupertinoAlertDialog(
-                        title: const Text('3D 변환중'),
+                        title: const Text(
+                          '3D 변환중',
+                          style: TextStyle(
+                              fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
+                        ),
                         content: Column(
-                          children: [
-                            const SizedBox(height: 16),
+                          children: const [
+                            SizedBox(height: 16),
                             CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
-                            const SizedBox(height: 16),
-                            const Text('3D 변환 중입니다...'),
+                            SizedBox(height: 16),
+                            Text(
+                              '3D 변환 중입니다...',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'cookierun'), // 폰트 변경
+                            ),
                           ],
                         ),
                       );
@@ -140,13 +173,19 @@ class SketchViewer extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Icon(CupertinoIcons.cube_box, color: CupertinoColors.white),
+                  Icon(
+                    CupertinoIcons.cube_box,
+                    color: CupertinoColors.white,
+                    size: 32, // 아이콘 크기 증가
+                  ),
                   SizedBox(width: 8),
                   Text(
-                    '장난감 변환',
+                    '장난감 만들기',
                     style: TextStyle(
                       color: CupertinoColors.white,
-                      fontSize: 18,
+                      fontSize: 32, // 버튼 텍스트 크기 증가
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'cookierun', // 폰트 변경
                     ),
                   ),
                 ],
