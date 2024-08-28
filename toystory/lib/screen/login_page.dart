@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'signup_page.dart';
 import 'home_page.dart';
 import 'package:toystory/services/api_service.dart';
@@ -24,11 +23,11 @@ class _LoginPageState extends State<LoginPage> {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: const Text('오류'),
-          content: const Text('이메일과 비밀번호를 입력해주세요.'),
+          title: const Text('오류'), // 폰트 패밀리 제거
+          content: const Text('이메일과 비밀번호를 입력해주세요.'), // 폰트 패밀리 제거
           actions: [
             CupertinoDialogAction(
-              child: const Text('확인'),
+              child: const Text('확인'), // 폰트 패밀리 제거
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -51,11 +50,11 @@ class _LoginPageState extends State<LoginPage> {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: const Text('로그인 실패'),
-          content: Text(e.toString()),
+          title: const Text('로그인 실패'), // 폰트 패밀리 제거
+          content: Text(e.toString()), // 폰트 패밀리 제거
           actions: [
             CupertinoDialogAction(
-              child: const Text('확인'),
+              child: const Text('확인'), // 폰트 패밀리 제거
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -82,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 580,
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
-            color: CupertinoColors.white.withOpacity(0.8), // 반투명 배경색
+            color: CupertinoColors.white.withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
             boxShadow: const [
               BoxShadow(
@@ -101,23 +100,23 @@ class _LoginPageState extends State<LoginPage> {
                   height: 180,
                   child: Center(
                     child: Image.asset(
-                      'assets/logo/toystory_logo.png', // 로고 이미지 경로
-                      height: 180, // 이미지 크기 조정
+                      'assets/logo/toystory_logo.png',
+                      height: 180,
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                // 이메일 입력 필드
                 Row(
                   children: [
                     const SizedBox(width: 20),
                     const SizedBox(
-                      width: 80, // 고정된 너비
+                      width: 80,
                       child: Text(
                         '이메일',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 22,
                           color: CupertinoColors.black,
+                          fontFamily: 'cookierun',
                         ),
                       ),
                     ),
@@ -128,23 +127,24 @@ class _LoginPageState extends State<LoginPage> {
                         placeholder: 'E-mail',
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 10),
+                        style: const TextStyle(fontFamily: 'cookierun'),
                       ),
                     ),
                     const SizedBox(width: 20),
                   ],
                 ),
                 const SizedBox(height: 20),
-                // 비밀번호 입력 필드
                 Row(
                   children: [
                     const SizedBox(width: 20),
                     const SizedBox(
-                      width: 80, // 고정된 너비
+                      width: 80,
                       child: Text(
                         '비밀번호',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 22,
                           color: CupertinoColors.black,
+                          fontFamily: 'cookierun',
                         ),
                       ),
                     ),
@@ -157,13 +157,13 @@ class _LoginPageState extends State<LoginPage> {
                             vertical: 16, horizontal: 10),
                         obscureText: true,
                         onSubmitted: (_) => handleLogin(),
+                        style: const TextStyle(fontFamily: 'cookierun'),
                       ),
                     ),
                     const SizedBox(width: 20),
                   ],
                 ),
                 const SizedBox(height: 40),
-                // 로그인 버튼
                 Container(
                   width: 300,
                   decoration: BoxDecoration(
@@ -176,17 +176,22 @@ class _LoginPageState extends State<LoginPage> {
                       '로그인',
                       style: TextStyle(
                         color: CupertinoColors.white,
+                        fontFamily: 'cookierun',
+                        fontSize: 20,
                       ),
                     ),
                     onPressed: handleLogin,
                   ),
                 ),
                 const SizedBox(height: 10),
-                // 회원가입 버튼
                 CupertinoButton(
                   child: const Text(
                     '회원가입',
-                    style: TextStyle(color: CupertinoColors.black),
+                    style: TextStyle(
+                      color: CupertinoColors.black,
+                      fontFamily: 'cookierun',
+                      fontSize: 20,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
