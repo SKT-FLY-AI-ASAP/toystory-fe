@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:toystory/widget/settings_button.dart';
 import 'package:toystory/widget/sketch_card.dart';
 import 'package:toystory/services/api_service.dart';
+import 'package:getwidget/getwidget.dart';
 
 class Sketch {
   final int sketchId;
@@ -21,12 +21,29 @@ class SketchListView extends StatefulWidget {
 }
 
 class _SketchListViewState extends State<SketchListView> {
+  String nickname = 'User';
   List<Sketch> sketches = [];
+  int userLevel = 1; // 사용자 레벨 상태 초기화
+  int nextLevel = 2;
+  int totalSketches = 0; // 전체 스케치 개수
+  double progressPercent = 0.0; // 프로그레스 바 진행률
 
   @override
   void initState() {
     super.initState();
     fetchSketchbookList(); // 데이터를 가져오는 함수 호출
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    try {
+      final response = await ApiService().fetchUserInfo();
+      setState(() {
+        nickname = response["data"]["nickname"];
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   // API 호출 함수
@@ -43,6 +60,16 @@ class _SketchListViewState extends State<SketchListView> {
             sketchUrl: json['sketch_url'],
           );
         }).toList();
+
+        // 스케치 개수에 따라 레벨 계산
+        totalSketches = sketches.length;
+        userLevel = (totalSketches / 5).ceil(); // 레벨 계산 (5개의 스케치당 1레벨)
+        nextLevel = userLevel + 1; // 다음 레벨
+
+        // 현재 레벨에서 그린 스케치 수
+        int sketchesInCurrentLevel = totalSketches % 5;
+        // 다음 레벨까지 남은 진행률 계산 (0.0 ~ 1.0)
+        progressPercent = sketchesInCurrentLevel / 5;
       });
     } catch (e) {
       print(e); // 에러 발생 시 처리
@@ -56,20 +83,41 @@ class _SketchListViewState extends State<SketchListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우로 배치
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우 배치
             children: [
               Text(
-                '스케치북',
-                style: CupertinoTheme.of(context)
-                    .textTheme
-                    .navTitleTextStyle
-                    .copyWith(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: CupertinoColors.systemIndigo,
-                    ),
+                '$nickname의 스케치북',
+                style: TextStyle(
+                  fontSize: 30,
+                  color: CupertinoColors.systemIndigo,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'cookierun',
+                ),
               ),
-              SettingsButton(),
+              SizedBox(width: 30),
+              // 프로그레스바를 SizedBox로 감싸서 크기 지정
+              SizedBox(
+                width: 380, // 너비 설정
+                height: 30, // 높이 설정
+                child: GFProgressBar(
+                  percentage: progressPercent, // 다음 레벨까지 남은 진행률
+                  lineHeight: 25,
+                  width: 200,
+                  alignment: MainAxisAlignment.spaceBetween,
+                  backgroundColor: CupertinoColors.systemGrey4,
+                  progressBarColor: CupertinoColors.systemIndigo,
+                  leading: Text('레벨 $userLevel',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: CupertinoColors.systemGrey,
+                          fontFamily: 'cookierun')),
+                  trailing: Text('레벨 $nextLevel',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: CupertinoColors.systemGrey,
+                          fontFamily: 'cookierun')),
+                ),
+              ),
             ],
           ),
           SizedBox(height: 10),
@@ -79,17 +127,21 @@ class _SketchListViewState extends State<SketchListView> {
               child: sketches.isEmpty
                   ? Center(child: CupertinoActivityIndicator()) // 로딩 중 표시
                   : ListView.separated(
-                      // ListView.separated로 간격을 설정
                       scrollDirection: Axis.horizontal,
                       itemCount: sketches.length,
                       separatorBuilder: (context, index) =>
-                          SizedBox(width: 20), // 간격을 줄이거나 늘릴 수 있음
+                          SizedBox(width: 20), // 간격 설정
                       itemBuilder: (context, index) {
                         final sketch = sketches[index];
-                        return SketchCard(
-                          sketchId: sketch.sketchId,
-                          sketchTitle: sketch.sketchTitle,
-                          sketchUrl: sketch.sketchUrl,
+                        return GestureDetector(
+                          onTap: () {
+                            // 카드 클릭 시 추가 동작을 수행할 수 있습니다.
+                          },
+                          child: SketchCard(
+                            sketchId: sketch.sketchId,
+                            sketchTitle: sketch.sketchTitle,
+                            sketchUrl: sketch.sketchUrl,
+                          ),
                         );
                       },
                     ),
