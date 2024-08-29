@@ -7,11 +7,13 @@ class ToyCard extends StatelessWidget {
   final int toyId;
   final String toyTitle;
   final String toyUrl;
+  final VoidCallback stopBGM; // BGM을 멈추는 콜백 추가
 
   ToyCard({
     required this.toyId,
     required this.toyTitle,
     required this.toyUrl,
+    required this.stopBGM, // 생성자에서 콜백 초기화
   });
 
   @override
@@ -23,6 +25,9 @@ class ToyCard extends StatelessWidget {
       height: 250, // 카드의 높이
       child: CupertinoButton(
         onPressed: () async {
+          // BGM 멈춤
+          stopBGM();
+
           // 효과음 재생
           try {
             await _audioPlayer.play(AssetSource('sounds/boing.mp3'));
@@ -83,10 +88,11 @@ class ToyCard extends StatelessWidget {
                     toyTitle,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        fontSize: 22, // 폰트 크기를 더 크게 설정
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.systemIndigo,
-                        fontFamily: 'cookierun'),
+                      fontSize: 22, // 폰트 크기를 더 크게 설정
+                      fontWeight: FontWeight.bold,
+                      color: CupertinoColors.systemIndigo,
+                      fontFamily: 'cookierun',
+                    ),
                   ),
                 ),
               ],

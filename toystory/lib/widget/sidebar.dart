@@ -8,23 +8,26 @@ import 'package:toystory/widget/settings_button.dart';
 
 class Sidebar extends StatefulWidget {
   final Function(bool) onBGMChanged;
+  final bool isBGMPlaying;
 
-  Sidebar({required this.onBGMChanged});
+  Sidebar({
+    required this.onBGMChanged,
+    required this.isBGMPlaying,
+  });
 
   @override
   _SidebarState createState() => _SidebarState();
 }
 
 class _SidebarState extends State<Sidebar> {
-  String nickname = "User";
-  bool _isBGMPlaying = true;
+  String nickname = "앤디";
   late AudioPlayer _audioPlayer;
 
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    fetchUserInfo();
+    //fetchUserInfo();
   }
 
   Future<void> fetchUserInfo() async {
@@ -36,13 +39,6 @@ class _SidebarState extends State<Sidebar> {
     } catch (e) {
       print(e);
     }
-  }
-
-  void _toggleBGM() {
-    setState(() {
-      _isBGMPlaying = !_isBGMPlaying;
-    });
-    widget.onBGMChanged(_isBGMPlaying);
   }
 
   Future<void> _playMagicSound() async {
@@ -64,178 +60,190 @@ class _SidebarState extends State<Sidebar> {
     return Container(
       color: CupertinoColors.systemIndigo.withOpacity(0.3),
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
 
-          Row(
-            // mainAxisAlignment:
-            //     MainAxisAlignment.spaceBetween, // Align the buttons properly
-            children: [
-              CupertinoButton(
-                onPressed: _toggleBGM,
-                padding: EdgeInsets.zero,
-                child: Icon(
-                  _isBGMPlaying
-                      ? CupertinoIcons.speaker_2_fill
-                      : CupertinoIcons.speaker_slash_fill,
-                  size: 30,
-                  color: CupertinoColors.systemIndigo,
-                ),
-              ),
-              SettingsButton()
-            ],
-          ),
-
-          //const SizedBox(height: 10),
-
-//프로필 이미지가 아니라 toy list에서 랜덤으로 그냥 뽑는걸루 하자,,ㅌ
-          // 원형 사진을 위한 CircleAvatar
-          Center(
-            child: CircleAvatar(
-              radius: 100, // 원형의 반지름
-              backgroundImage:
-                  AssetImage('assets/img/profile_image.png'), // 사진 경로
-              backgroundColor:
-                  CupertinoColors.systemGrey.withOpacity(0.3), // 사진이 없을 때의 배경색
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // 안녕, $nickname! 텍스트
-          Center(
-            child: Text(
-              '안녕, $nickname!',
-              style: CupertinoTheme.of(context)
-                  .textTheme
-                  .navTitleTextStyle
-                  .copyWith(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.systemIndigo,
-                    fontFamily: 'cookierun',
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // 너만의 세상을 만들어볼래? 텍스트
-          Center(
-            child: Text(
-              '너만의 세상을\n만들어볼래?',
-              style: CupertinoTheme.of(context)
-                  .textTheme
-                  .navTitleTextStyle
-                  .copyWith(
-                    fontSize: 25,
-                    color: CupertinoColors.systemIndigo.withOpacity(0.7),
-                    fontFamily: 'cookierun',
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 30),
-
-          const Spacer(), // Spacer to push the buttons to the bottom
-
-          // 주문외우기 버튼
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                  offset: Offset(2, 4),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: CupertinoButton(
-              color: CupertinoColors.systemIndigo,
-              onPressed: () {
-                if (_isBGMPlaying) {
-                  _toggleBGM();
-                }
-                _playMagicSound();
-                showMagicDialog(context);
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.auto_fix_high,
-                      color: CupertinoColors.white, size: 24),
-                  SizedBox(width: 10),
-                  Flexible(
-                    child: Text(
-                      '주문외우기',
-                      style: TextStyle(
-                          color: CupertinoColors.white,
-                          fontSize: 22,
-                          fontFamily: 'cookierun',
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        CupertinoButton(
+                          onPressed: () {
+                            widget.onBGMChanged(!widget.isBGMPlaying);
+                          },
+                          padding: EdgeInsets.zero,
+                          child: Icon(
+                            widget.isBGMPlaying
+                                ? CupertinoIcons.speaker_2_fill
+                                : CupertinoIcons.speaker_slash_fill,
+                            size: 30,
+                            color: CupertinoColors.systemIndigo,
+                          ),
+                        ),
+                        Flexible(
+                          child: SettingsButton(),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
 
-          // 그림그리기 버튼
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                  offset: Offset(2, 4),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: CupertinoButton(
-              color: CupertinoColors.systemIndigo,
-              onPressed: () {
-                if (_isBGMPlaying) {
-                  _toggleBGM();
-                }
-                _playMagicSound();
-                Navigator.of(context, rootNavigator: true).push(
-                  CupertinoPageRoute(
-                    fullscreenDialog: false,
-                    builder: (context) => const DrawPage(),
-                  ),
-                );
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.palette, color: CupertinoColors.white, size: 24),
-                  SizedBox(width: 10),
-                  Flexible(
-                    child: Text(
-                      '그림그리기',
-                      style: TextStyle(
-                        color: CupertinoColors.white,
-                        fontSize: 22,
-                        fontFamily: 'cookierun',
-                        fontWeight: FontWeight.bold,
+                    // 프로필 이미지
+                    Center(
+                      child: CircleAvatar(
+                        radius: 100,
+                        backgroundImage:
+                            AssetImage('assets/img/3d/image_1.webp'),
+                        backgroundColor:
+                            CupertinoColors.systemGrey.withOpacity(0.3),
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 20),
+
+                    // 닉네임 표시
+                    Center(
+                      child: Text(
+                        '안녕, $nickname!',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navTitleTextStyle
+                            .copyWith(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: CupertinoColors.systemIndigo,
+                              fontFamily: 'cookierun',
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 안내 텍스트
+                    Center(
+                      child: Text(
+                        '너만의 세상을\n만들어볼래?',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navTitleTextStyle
+                            .copyWith(
+                              fontSize: 25,
+                              color:
+                                  CupertinoColors.systemIndigo.withOpacity(0.7),
+                              fontFamily: 'cookierun',
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    Spacer(),
+
+                    // 주문외우기 버튼
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 6,
+                            offset: Offset(2, 4),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: CupertinoButton(
+                        color: CupertinoColors.systemIndigo,
+                        onPressed: () {
+                          if (widget.isBGMPlaying) {
+                            widget.onBGMChanged(false);
+                          }
+                          _playMagicSound();
+                          showMagicDialog(context);
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.auto_fix_high,
+                                color: CupertinoColors.white, size: 24),
+                            SizedBox(width: 10),
+                            Flexible(
+                              child: Text(
+                                '주문외우기',
+                                style: TextStyle(
+                                    color: CupertinoColors.white,
+                                    fontSize: 22,
+                                    fontFamily: 'cookierun',
+                                    fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 그림그리기 버튼
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 6,
+                            offset: Offset(2, 4),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: CupertinoButton(
+                        color: CupertinoColors.systemIndigo,
+                        onPressed: () {
+                          if (widget.isBGMPlaying) {
+                            widget.onBGMChanged(false);
+                          }
+                          _playMagicSound();
+                          Navigator.of(context, rootNavigator: true).push(
+                            CupertinoPageRoute(
+                              fullscreenDialog: false,
+                              builder: (context) => const DrawPage(),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.palette,
+                                color: CupertinoColors.white, size: 24),
+                            SizedBox(width: 10),
+                            Flexible(
+                              child: Text(
+                                '그림그리기',
+                                style: TextStyle(
+                                  color: CupertinoColors.white,
+                                  fontSize: 22,
+                                  fontFamily: 'cookierun',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+          );
+        },
       ),
     );
   }

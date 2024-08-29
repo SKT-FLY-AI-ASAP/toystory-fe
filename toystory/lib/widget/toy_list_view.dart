@@ -16,12 +16,14 @@ class Toy {
 }
 
 class ToyListView extends StatefulWidget {
+  final VoidCallback stopBGM;
+  ToyListView({required this.stopBGM});
   @override
   _ToyListViewState createState() => _ToyListViewState();
 }
 
 class _ToyListViewState extends State<ToyListView> {
-  String nickname = 'User';
+  String nickname = '앤디';
   List<Toy> toys = [];
   int userLevel = 1; // 사용자 레벨 상태 초기화
   int nextLevel = 2;
@@ -32,7 +34,7 @@ class _ToyListViewState extends State<ToyListView> {
   void initState() {
     super.initState();
     fetchToyList(); // 데이터를 가져오는 함수 호출
-    fetchUserInfo();
+    //fetchUserInfo();
   }
 
   Future<void> fetchUserInfo() async {
@@ -72,58 +74,6 @@ class _ToyListViewState extends State<ToyListView> {
     } catch (e) {
       print('Error fetching toy data: $e');
     }
-  }
-
-  // 레벨 텍스트를 터치했을 때 안내 팝업을 보여주는 함수
-  void _showLevelInfoDialog(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text(
-            '장난감 수집가',
-            style: TextStyle(
-              fontSize: 24, // 제목 글씨 크기 설정
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            '장난감을 5개 수집하면\n 레벨이 올라가요!',
-            style: TextStyle(
-              fontSize: 20, // 내용 글씨 크기 설정
-            ),
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text(
-                '확인',
-                style: TextStyle(
-                  fontSize: 18, // 확인 버튼 글씨 크기 설정
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // 팝업 닫기
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // 레벨에 따라 별을 보여주는 위젯 생성
-  Widget _buildStars(int level) {
-    List<Widget> stars = [];
-    for (int i = 0; i < level; i++) {
-      stars.add(const Icon(
-        CupertinoIcons.star_fill,
-        color: CupertinoColors.systemYellow,
-        size: 20,
-      ));
-    }
-    return Row(
-      children: stars,
-    );
   }
 
   @override
@@ -201,13 +151,12 @@ class _ToyListViewState extends State<ToyListView> {
                       itemBuilder: (context, index) {
                         final toy = toys[index];
                         return GestureDetector(
-                          onTap: () {
-                            // 클릭 시 추가 동작 수행
-                          },
+                          onTap: () {},
                           child: ToyCard(
                             toyId: toy.toyId,
                             toyTitle: toy.toyTitle,
                             toyUrl: toy.toyUrl,
+                            stopBGM: widget.stopBGM,
                           ),
                         );
                       },

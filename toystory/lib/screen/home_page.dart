@@ -10,35 +10,52 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AudioPlayer _audioPlayer;
-  bool _isBGMPlaying = true; // BGM 상태 추적
+  static AudioPlayer? _audioPlayer;
+  bool _isBGMPlaying = true;
 
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
-    _audioPlayer.setReleaseMode(ReleaseMode.loop); // 반복 모드로 설정
-    _playBGM();
-  }
 
-  void _playBGM() async {
-    if (_isBGMPlaying) {
-      await _audioPlayer.play(AssetSource('sounds/cute2.mp3'), volume: 0.5);
-    } else {
-      await _audioPlayer.stop();
+    if (_audioPlayer == null) {
+      _audioPlayer = AudioPlayer();
+      _audioPlayer!.setReleaseMode(ReleaseMode.loop);
+      _audioPlayer!.onPlayerStateChanged.listen((PlayerState state) {
+        setState(() {
+          _isBGMPlaying = state == PlayerState.playing;
+        });
+      });
+      _playBGM(); // 초기화 후 바로 재생
     }
   }
 
-  void _onBGMChanged(bool isPlaying) {
+  Future<void> _playBGM() async {
+    if (!_isBGMPlaying) {
+      await _audioPlayer!.play(AssetSource('sounds/cute2.mp3'), volume: 0.5);
+      setState(() {
+        _isBGMPlaying = true;
+      });
+    }
+  }
+
+  void _stopBGM() {
+    _audioPlayer!.stop();
     setState(() {
-      _isBGMPlaying = isPlaying;
+      _isBGMPlaying = false;
     });
-    _playBGM();
+  }
+
+  void _onBGMChanged(bool isPlaying) {
+    if (isPlaying) {
+      _playBGM();
+    } else {
+      _stopBGM();
+    }
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _audioPlayer!.dispose();
     super.dispose();
   }
 
@@ -49,9 +66,11 @@ class _HomePageState extends State<HomePage> {
         children: [
           Expanded(
             flex: 1,
-            child: Sidebar(onBGMChanged: _onBGMChanged),
+            child: Sidebar(
+              isBGMPlaying: _isBGMPlaying,
+              onBGMChanged: _onBGMChanged,
+            ),
           ),
-          // 메인 컨텐츠 영역
           Expanded(
             flex: 3,
             child: Padding(
@@ -60,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SketchListView(),
                   SizedBox(height: 40),
-                  ToyListView(),
+                  ToyListView(
+                    stopBGM: _stopBGM,
+                  ),
                 ],
               ),
             ),

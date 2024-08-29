@@ -19,15 +19,15 @@ class _My3DModelState extends State<My3DModel> {
   String? modelUrl;
   String? stlUrl;
   String? contentTitle;
-  String? backgroundUrl; // 배경 이미지 URL
-  String? backgroundMusicUrl; // 배경 음악 URL
+  String? backgroundUrl;
+  String? backgroundMusicUrl;
   late AudioPlayer _audioPlayer;
-  bool isPlaying = false; // 배경 음악 재생 상태
+  bool isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer(); // 오디오 플레이어 초기화
+    _audioPlayer = AudioPlayer();
     fetch3DModelData();
   }
 
@@ -38,9 +38,13 @@ class _My3DModelState extends State<My3DModel> {
       setState(() {
         stlUrl = response['design_url'];
         contentTitle = response['content_title'];
-        modelUrl = 'assets/glb/5.glb'; // 하나의 GLB 파일만 사용
-        backgroundUrl = response['background_image_url']; // 배경 이미지 URL 설정
-        backgroundMusicUrl = response['background_music_url']; // 배경 음악 URL 설정
+        //modelUrl = 'assets/glb/yong.glb'; // 하나의 GLB 파일만 사용
+        modelUrl = response['model_url']; // API에서 받은 3D 모델 파일 URL로 설정
+        //backgroundUrl = 'assets/img/design/8.webp'; // 배경 이미지 URL 설정
+        //backgroundUrl = response['background_image_url']; // 배경 이미지 URL 설정
+        backgroundUrl = response['background_image_url'];
+        backgroundMusicUrl =
+            'https://asap-bucket.s3.ap-northeast-2.amazonaws.com/bgm/0-1teddybear.mp3'; // 배경 음악 URL 설정
       });
       playBackgroundMusic(); // 배경 음악 재생
     } catch (e) {
@@ -116,7 +120,7 @@ class _My3DModelState extends State<My3DModel> {
           // 배경 이미지 설정
           if (backgroundUrl != null && backgroundUrl!.isNotEmpty)
             Positioned.fill(
-              child: Image.network(
+              child: Image.asset(
                 backgroundUrl!,
                 fit: BoxFit.cover,
               ),
@@ -130,8 +134,10 @@ class _My3DModelState extends State<My3DModel> {
                   backgroundColor: Colors.transparent,
                   src: modelUrl!,
                   alt: contentTitle ?? 'A 3D model of a toy',
-                  ar: true,
+                  ar: false,
                   autoRotate: true,
+                  autoPlay: true,
+                  animationName: 'worldAction',
                   iosSrc:
                       'https://modelviewer.dev/shared-assets/models/Astronaut.usdz',
                   disableZoom: false,

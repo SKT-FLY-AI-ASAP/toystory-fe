@@ -21,7 +21,7 @@ class SketchListView extends StatefulWidget {
 }
 
 class _SketchListViewState extends State<SketchListView> {
-  String nickname = 'User';
+  String nickname = '앤디';
   List<Sketch> sketches = [];
   int userLevel = 1; // 사용자 레벨 상태 초기화
   int nextLevel = 2;
@@ -32,7 +32,7 @@ class _SketchListViewState extends State<SketchListView> {
   void initState() {
     super.initState();
     fetchSketchbookList(); // 데이터를 가져오는 함수 호출
-    fetchUserInfo();
+    //fetchUserInfo();
   }
 
   Future<void> fetchUserInfo() async {
