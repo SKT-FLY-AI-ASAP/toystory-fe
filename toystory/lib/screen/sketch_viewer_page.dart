@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/confirm_3d_dialog.dart';
 import 'package:toystory/services/api_service.dart';
+import 'home_page.dart';
 
 class SketchViewer extends StatelessWidget {
   final String title;
@@ -27,21 +28,25 @@ class SketchViewer extends StatelessWidget {
           return CupertinoAlertDialog(
             title: const Text(
               '장난감 만들기 완료',
-              style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
+              //style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
             ),
             content: const Text(
               '장난감이 만들어졌어! \n 장난감 상자에서 확인해봐~',
-              style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
+              //style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
             ),
             actions: [
               CupertinoDialogAction(
                 child: const Text(
                   '확인',
-                  style:
-                      TextStyle(fontSize: 20, fontFamily: 'cookierun'), // 폰트 변경
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -57,18 +62,16 @@ class SketchViewer extends StatelessWidget {
           return CupertinoAlertDialog(
             title: const Text(
               '장난감 만들기 실패',
-              style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
+              //style: TextStyle(fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
             ),
             content: const Text(
               '장난감 만들기에 실패했어. \n 다시 시도해봐',
-              style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
+              //style: TextStyle(fontSize: 18, fontFamily: 'cookierun'), // 폰트 변경
             ),
             actions: [
               CupertinoDialogAction(
                 child: const Text(
                   '확인',
-                  style:
-                      TextStyle(fontSize: 20, fontFamily: 'cookierun'), // 폰트 변경
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -145,7 +148,7 @@ class SketchViewer extends StatelessWidget {
                     builder: (context) {
                       return CupertinoAlertDialog(
                         title: const Text(
-                          '3D 변환중',
+                          '장난감 생성',
                           style: TextStyle(
                               fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
                         ),
@@ -155,7 +158,7 @@ class SketchViewer extends StatelessWidget {
                             CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
                             SizedBox(height: 16),
                             Text(
-                              '3D 변환 중입니다...',
+                              '장난감 생성 중입니다...',
                               style: TextStyle(
                                   fontSize: 18,
                                   fontFamily: 'cookierun'), // 폰트 변경
@@ -183,7 +186,7 @@ class SketchViewer extends StatelessWidget {
                     '장난감 만들기',
                     style: TextStyle(
                       color: CupertinoColors.white,
-                      fontSize: 32, // 버튼 텍스트 크기 증가
+                      fontSize: 24, // 버튼 텍스트 크기 증가
                       fontWeight: FontWeight.bold,
                       fontFamily: 'cookierun', // 폰트 변경
                     ),

@@ -30,6 +30,7 @@ class _TitleInputDialogState extends State<TitleInputDialog> {
         setState(() {
           _isListening = true;
           _recognizedText = "듣고 있어요...";
+          _finalRecognizedText = ""; // 녹음 시작 시 이전 텍스트 초기화
         });
         _speechToText.listen(
           onResult: (result) {

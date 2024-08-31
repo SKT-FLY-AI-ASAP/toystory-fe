@@ -26,9 +26,39 @@ class ApiService {
 
   ApiService() {
     _dio.options.baseUrl = 'http://52.79.56.132:8080/api/v1';
+
+    // 인터셉터 추가
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        print('--- Request ---');
+        print('URL: ${options.uri}');
+        print('Method: ${options.method}');
+        print('Headers: ${options.headers}');
+        print('Data: ${options.data}');
+        print('----------------');
+        handler.next(options); // 요청을 계속 진행
+      },
+      onResponse: (response, handler) {
+        print('--- Response ---');
+        print('Status code: ${response.statusCode}');
+        print('Data: ${response.data}');
+        print('----------------');
+        handler.next(response); // 응답을 계속 진행
+      },
+      onError: (DioException e, handler) {
+        print('--- Error ---');
+        print('Error: ${e.message}');
+        if (e.response != null) {
+          print('Status code: ${e.response?.statusCode}');
+          print('Data: ${e.response?.data}');
+        }
+        print('----------------');
+        handler.next(e); // 오류를 계속 진행
+      },
+    ));
   }
 
-  //이메일 인증 링크 전송
+  // 이메일 인증 링크 전송
   Future<void> sendVerificationLink(String email) async {
     try {
       final response = await _dio.post(
@@ -47,11 +77,11 @@ class ApiService {
       }
     } catch (e) {
       print(e);
-      throw Exception('네트워크 오류가 발생했습니다 다시 시도해주세요');
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요');
     }
   }
 
-  //닉네임 중복 확인
+  // 닉네임 중복 확인
   Future<void> checkNicknameAvailability(String nickname) async {
     try {
       final response = await _dio.get(
@@ -74,7 +104,7 @@ class ApiService {
     }
   }
 
-  //이메일 인증상태 확인
+  // 이메일 인증상태 확인
   Future<void> checkEmailVerificationStatus(String email) async {
     try {
       final response =
@@ -133,7 +163,7 @@ class ApiService {
     }
   }
 
-  //로그인
+  // 로그인
   Future<void> login({
     required String email,
     required String password,
@@ -154,9 +184,6 @@ class ApiService {
 
       if (response.statusCode == 201) {
         TokenStorage.saveToken(response.data['data']['access_token']);
-        //print(response.data['data']['access_token']);
-        //print(response.data[data]['access_token']);
-        //print(responseData['data']['access_token']);
         print('Login successful.');
       } else {
         print(response.data);
@@ -183,7 +210,6 @@ class ApiService {
         final responseData = response.data;
         print(responseData);
 
-        // 응답 데이터를 반환
         return responseData;
       } else {
         throw Exception('스케치북 리스트 조회에 실패했습니다. 다시 시도해주세요.');
@@ -196,36 +222,34 @@ class ApiService {
 
   // 스케치북 새로 만들기 (PNG 파일 업로드)
   Future<dynamic> createSketchbook({
-    required String title, // 스케치북 제목
-    required File file, // PNG 파일
+    required String title,
+    required File file,
   }) async {
     try {
       String? accessToken = TokenStorage.getToken();
 
-      // MultipartFile로 파일 변환
       MultipartFile multipartFile = await MultipartFile.fromFile(
         file.path,
-        filename: file.path.split('/').last, // 파일 이름 지정
-        contentType: MediaType('image', 'png'), // MIME 타입 지정
+        filename: file.path.split('/').last,
+        contentType: MediaType('image', 'png'),
       );
 
-      // POST 요청 보내기 (multipart/form-data)
       final response = await _dio.post(
         '/doc/2d',
         options: Options(headers: {
-          'Authorization': 'Bearer $accessToken', // 토큰 추가
-          'Content-type': 'multipart/form-data', // Content-Type 지정
+          'Authorization': 'Bearer $accessToken',
+          'Content-type': 'multipart/form-data',
         }),
         data: FormData.fromMap({
-          'title': title, // 요청에 필요한 필드
-          'file': multipartFile, // PNG 파일 업로드
+          'title': title,
+          'file': multipartFile,
         }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final responseData = response.data;
         print('스케치북 생성 성공: $responseData');
-        return responseData; // 생성된 스케치북 데이터 반환
+        return responseData;
       } else {
         throw Exception('스케치북 생성에 실패했습니다. 다시 시도해주세요.');
       }
@@ -235,14 +259,12 @@ class ApiService {
     }
   }
 
-// 3D 아이템 조회
-
+  // 3D 아이템 조회
   Future<dynamic> fetchThreeDItems() async {
     try {
-      String? accessToken = await TokenStorage
-          .getToken(); // Assuming this fetches the token asynchronously
+      String? accessToken = await TokenStorage.getToken();
       final response = await _dio.get(
-        '/doc/3d/list', // Replace with your actual API endpoint for 3D items
+        '/doc/3d/list',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -254,7 +276,32 @@ class ApiService {
         final responseData = response.data;
         print(responseData);
 
-        // 응답 데이터를 반환
+        return responseData;
+      } else {
+        throw Exception('3D 아이템 리스트 조회에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  Future<dynamic> fetchSttItems() async {
+    try {
+      String? accessToken = await TokenStorage.getToken();
+      final response = await _dio.get(
+        '/doc/stt/list',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        print(responseData);
+
         return responseData;
       } else {
         throw Exception('3D 아이템 리스트 조회에 실패했습니다. 다시 시도해주세요.');
@@ -268,12 +315,10 @@ class ApiService {
   // 3D 세부 조회 API 함수
   Future<dynamic> fetch3DItemDetails({required int contentId}) async {
     try {
-      // Access Token을 비동기로 가져오기
       String? accessToken = await TokenStorage.getToken();
 
-      // GET 요청 보내기 (세부 조회 경로에 contentId 포함)
       final response = await _dio.get(
-        '/doc/$contentId', // 경로에 contentId 삽입
+        '/doc/$contentId',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -281,7 +326,6 @@ class ApiService {
         ),
       );
 
-      // 응답 확인
       if (response.statusCode == 200) {
         final responseData = response.data;
         print(responseData);
@@ -298,10 +342,9 @@ class ApiService {
   // 주문외우기 조회
   Future<dynamic> fetchMagicItems() async {
     try {
-      String? accessToken = await TokenStorage
-          .getToken(); // Assuming this fetches the token asynchronously
+      String? accessToken = await TokenStorage.getToken();
       final response = await _dio.get(
-        '/doc/stt/list', // Replace with your actual API endpoint for 3D items
+        '/doc/stt/list',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -313,7 +356,6 @@ class ApiService {
         final responseData = response.data;
         print(responseData);
 
-        // 응답 데이터를 반환
         return responseData;
       } else {
         throw Exception('3D 아이템 리스트 조회에 실패했습니다. 다시 시도해주세요.');
@@ -327,23 +369,19 @@ class ApiService {
   // 로그아웃 함수
   Future<void> logout() async {
     try {
-      String? accessToken = await TokenStorage.getToken(); // 토큰을 비동기로 가져옴
+      String? accessToken = await TokenStorage.getToken();
       final response = await _dio.delete(
-        '/user/session', // 로그아웃 API 엔드포인트
+        '/user/session',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+            'Authorization': 'Bearer $accessToken',
           },
         ),
       );
 
       if (response.statusCode == 200) {
         print('로그아웃 성공');
-
-        // 로그아웃 성공 시 저장된 토큰 삭제
-        TokenStorage.clearToken(); // 토큰 삭제
-
-        // 추가적으로 로그아웃 후 처리할 로직이 있다면 여기에 작성하세요.
+        TokenStorage.clearToken();
       } else {
         throw Exception('로그아웃에 실패했습니다. 다시 시도해주세요.');
       }
@@ -353,7 +391,7 @@ class ApiService {
     }
   }
 
-  //가입 정보 조회
+  // 가입 정보 조회
   Future<dynamic> fetchUserInfo() async {
     try {
       String? accessToken = await TokenStorage.getToken();
@@ -378,7 +416,7 @@ class ApiService {
     }
   }
 
-  //스케치북 장난감 생성 요청
+  // 스케치북 장난감 생성 요청
   Future<dynamic> createToy({
     required int sketch_id,
     required String title,
@@ -386,19 +424,20 @@ class ApiService {
     try {
       String? accessToken = await TokenStorage.getToken();
       final response = await _dio.post(
-        '/2d/3d', // 로그아웃 API 엔드포인트
+        '/doc/2d/3d',
         data: {
           'sketch_id': sketch_id,
           'title': title,
         },
         options: Options(
           headers: {
-            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+            'Authorization': 'Bearer $accessToken',
+            'Content-type': 'application/json',
           },
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final responseData = response.data;
         return responseData;
       } else {
@@ -410,26 +449,28 @@ class ApiService {
     }
   }
 
-  //주문 외우기 새로 만들기
-  Future<void> createStt(
-      {required String title, required String prompt}) async {
+  // 주문 외우기 새로 만들기
+  Future<void> createStt({
+    required String title,
+    required String prompt,
+  }) async {
     try {
       String? accessToken = await TokenStorage.getToken();
       final response = await _dio.post(
-        '/doc/stt/3d', // 로그아웃 API 엔드포인트
+        '/doc/stt/3d',
         data: {
           'title': title,
           'prompt': prompt,
         },
         options: Options(
           headers: {
-            'Authorization': 'Bearer $accessToken', // 토큰을 Authorization 헤더에 포함
+            'Authorization': 'Bearer $accessToken',
             'Content-type': 'application/json',
           },
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final responseData = response.data;
         return responseData;
       } else {

@@ -16,12 +16,14 @@ class Toy {
 }
 
 class ToyListView extends StatefulWidget {
+  ToyListView({Key? key}) : super(key: key);
+
   @override
   _ToyListViewState createState() => _ToyListViewState();
 }
 
 class _ToyListViewState extends State<ToyListView> {
-  String nickname = 'User';
+  String nickname = '앤디';
   List<Toy> toys = [];
   int userLevel = 1; // 사용자 레벨 상태 초기화
   int nextLevel = 2;
@@ -32,7 +34,6 @@ class _ToyListViewState extends State<ToyListView> {
   void initState() {
     super.initState();
     fetchToyList(); // 데이터를 가져오는 함수 호출
-    fetchUserInfo();
   }
 
   Future<void> fetchUserInfo() async {
@@ -49,21 +50,39 @@ class _ToyListViewState extends State<ToyListView> {
   // API 호출 함수
   Future<void> fetchToyList() async {
     try {
-      // API 서비스에서 데이터를 가져옴
-      final response = await ApiService().fetchThreeDItems();
+      // 3D 아이템 데이터를 가져오는 API 호출
+      final threeDResponse = await ApiService().fetchThreeDItems();
+      final sttResponse =
+          await ApiService().fetchSttItems(); // STT 아이템 데이터를 가져오는 API 호출
+
       setState(() {
-        // 응답 데이터를 Toy 객체 리스트로 변환
-        toys = (response['data'] as List).map<Toy>((json) {
+        // 3D 아이템을 Toy 리스트에 추가
+        List<Toy> threeDToys =
+            (threeDResponse['data'] as List).map<Toy>((json) {
           return Toy(
             toyId: json['content_id'],
             toyTitle: json['content_title'],
-            toyUrl: json['content_url'],
+            toyUrl: json['thumbnail_url'] ?? 'https://via.placeholder.com/150',
           );
         }).toList();
 
-        // toys의 개수에 따라 userLevel을 계산 (toys.length 나누기 5)
+        // STT 아이템을 Toy 리스트에 추가
+        List<Toy> sttToys = (sttResponse['data'] as List).map<Toy>((json) {
+          return Toy(
+            toyId: json['content_id'],
+            toyTitle: json['content_title'],
+            toyUrl: json['thumbnail_url'] ?? 'https://via.placeholder.com/150',
+          );
+        }).toList();
+
+        // 두 리스트를 합침
+        toys = [...threeDToys, ...sttToys];
+
+        // toyId 기준으로 오름차순 정렬
+        toys.sort((a, b) => a.toyId.compareTo(b.toyId));
+
         totalToys = toys.length;
-        userLevel = (toys.length / 5).ceil(); // 나눈 값의 올림 처리
+        userLevel = (toys.length / 5).ceil();
         nextLevel = userLevel + 1;
 
         int toysInCurrentLevel = totalToys % 5;
@@ -72,58 +91,6 @@ class _ToyListViewState extends State<ToyListView> {
     } catch (e) {
       print('Error fetching toy data: $e');
     }
-  }
-
-  // 레벨 텍스트를 터치했을 때 안내 팝업을 보여주는 함수
-  void _showLevelInfoDialog(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text(
-            '장난감 수집가',
-            style: TextStyle(
-              fontSize: 24, // 제목 글씨 크기 설정
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            '장난감을 5개 수집하면\n 레벨이 올라가요!',
-            style: TextStyle(
-              fontSize: 20, // 내용 글씨 크기 설정
-            ),
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text(
-                '확인',
-                style: TextStyle(
-                  fontSize: 18, // 확인 버튼 글씨 크기 설정
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // 팝업 닫기
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // 레벨에 따라 별을 보여주는 위젯 생성
-  Widget _buildStars(int level) {
-    List<Widget> stars = [];
-    for (int i = 0; i < level; i++) {
-      stars.add(const Icon(
-        CupertinoIcons.star_fill,
-        color: CupertinoColors.systemYellow,
-        size: 20,
-      ));
-    }
-    return Row(
-      children: stars,
-    );
   }
 
   @override
@@ -201,9 +168,7 @@ class _ToyListViewState extends State<ToyListView> {
                       itemBuilder: (context, index) {
                         final toy = toys[index];
                         return GestureDetector(
-                          onTap: () {
-                            // 클릭 시 추가 동작 수행
-                          },
+                          onTap: () {},
                           child: ToyCard(
                             toyId: toy.toyId,
                             toyTitle: toy.toyTitle,

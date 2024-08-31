@@ -16,7 +16,7 @@ class SettingsButton extends StatelessWidget {
       },
       child: Icon(
         CupertinoIcons.settings,
-        color: const Color.fromARGB(255, 54, 23, 206),
+        color: CupertinoColors.systemIndigo,
         size: 22.0,
       ),
     );

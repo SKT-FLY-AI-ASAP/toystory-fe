@@ -63,12 +63,42 @@ class ToyCard extends StatelessWidget {
                         return Container(
                           color: Colors.white, // 이미지 로드 실패 시 흰색 네모를 표시
                           child: Center(
-                            child: Text(
-                              '이미지 불러오기 실패',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '이미지 불러오기 실패',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '오류: $error', // 오류 내용을 표시
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 10,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (error.toString().contains('403'))
+                                  Text(
+                                    '403 Forbidden: 권한이 없습니다.',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                              ],
                             ),
                           ),
                         );
@@ -83,10 +113,11 @@ class ToyCard extends StatelessWidget {
                     toyTitle,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        fontSize: 22, // 폰트 크기를 더 크게 설정
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.systemIndigo,
-                        fontFamily: 'cookierun'),
+                      fontSize: 22, // 폰트 크기를 더 크게 설정
+                      fontWeight: FontWeight.bold,
+                      color: CupertinoColors.systemIndigo,
+                      fontFamily: 'cookierun',
+                    ),
                   ),
                 ),
               ],

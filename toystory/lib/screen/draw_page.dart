@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:scribble/scribble.dart';
 import 'package:value_notifier_tools/value_notifier_tools.dart';
 import 'package:toystory/widget/title_input_dialog.dart';
-import 'package:toystory/services/api_service.dart'; // Your API service
+import 'package:toystory/services/api_service.dart';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui; // Import dart:ui for image manipulation
+import 'dart:async'; // Import dart:async for Completer
 import 'package:path_provider/path_provider.dart';
 import 'home_page.dart';
 
@@ -18,7 +20,7 @@ class DrawPage extends StatefulWidget {
 
 class _DrawPageState extends State<DrawPage> {
   late ScribbleNotifier notifier;
-  String _title = ""; // Title entered by the user
+  String _title = "";
 
   @override
   void initState() {
@@ -42,7 +44,7 @@ class _DrawPageState extends State<DrawPage> {
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
-          children: _buildActions(context),
+          children: _buildActions(),
         ),
       ),
       child: Padding(
@@ -64,11 +66,11 @@ class _DrawPageState extends State<DrawPage> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  _buildColorToolbar(context),
+                  _buildColorToolbar(),
                   const VerticalDivider(width: 32),
-                  _buildStrokeToolbar(context),
+                  _buildStrokeToolbar(),
                   const Expanded(child: SizedBox()),
-                  _buildPointerModeSwitcher(context),
+                  _buildPointerModeSwitcher(),
                 ],
               ),
             ),
@@ -78,7 +80,7 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  List<Widget> _buildActions(BuildContext context) {
+  List<Widget> _buildActions() {
     return [
       ValueListenableBuilder(
         valueListenable: notifier,
@@ -106,7 +108,7 @@ class _DrawPageState extends State<DrawPage> {
       ),
       CupertinoButton(
         padding: EdgeInsets.zero,
-        onPressed: _handleTitleInput, // Handle title input button press
+        onPressed: _handleTitleInput,
         child: Text(
           '제목 입력 및 저장',
           style: TextStyle(
@@ -119,25 +121,26 @@ class _DrawPageState extends State<DrawPage> {
   }
 
   Future<void> _handleTitleInput() async {
-    // Show TitleInputDialog and handle the title input
-    showCupertinoDialog(
+    final result = await showCupertinoDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return TitleInputDialog(
-          onTitleSaved: (result) {
-            setState(() {
-              _title = result; // Save title
-            });
-            Navigator.of(context).pop(); // Close the dialog
-            _saveSketch(); // Save the sketch after title is set
+          onTitleSaved: (title) {
+            Navigator.of(context).pop(title);
           },
         );
       },
     );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _title = result;
+      });
+      await _saveSketch();
+    }
   }
 
   Future<void> _saveSketch() async {
-    // Show "Saving" dialog
     showCupertinoDialog(
       context: context,
       barrierDismissible: false,
@@ -152,36 +155,85 @@ class _DrawPageState extends State<DrawPage> {
       },
     );
 
-    // Render the image from Scribble
-    final ByteData? imageData = await notifier.renderImage();
-    if (imageData != null) {
-      final Uint8List imageBytes = imageData.buffer.asUint8List();
-      final savedFile = await _saveImageToFile(imageBytes);
+    try {
+      // Step 1: Render the transparent image
+      final ByteData? imageData = await notifier.renderImage();
+      if (imageData == null) {
+        throw Exception('Failed to render the image.');
+      }
 
-      if (savedFile != null) {
-        try {
-          // Call the API to create the sketchbook with title and image
+      // Convert ByteData to ui.Image
+      final ui.Image originalImage = await _loadImage(imageData);
+
+      // Step 2: Create a white background image with the same size
+      final ui.Image whiteBackgroundImage = await _createWhiteBackgroundImage(
+          originalImage.width, originalImage.height);
+
+      // Step 3: Combine the white background and the original image
+      final ui.Image combinedImage =
+          await _combineImages(whiteBackgroundImage, originalImage);
+
+      // Convert the combined image to PNG
+      final ByteData? combinedByteData =
+          await combinedImage.toByteData(format: ui.ImageByteFormat.png);
+      if (combinedByteData != null) {
+        final Uint8List imageBytes = combinedByteData.buffer.asUint8List();
+        final savedFile = await _saveImageToFile(imageBytes);
+
+        if (savedFile != null) {
           await ApiService().createSketchbook(
             title: _title,
             file: savedFile,
           );
 
-          Navigator.of(context).pop(); // Close the saving dialog
-
-          // Show success dialog
+          Navigator.of(context).pop();
           await _showSaveSuccessDialog();
-        } catch (e) {
-          Navigator.of(context).pop(); // Close the saving dialog
-          // Show failure dialog
-          await _showSaveFailureDialog();
-          print("Error during saving: $e");
+        } else {
+          throw Exception('Failed to save the image file.');
         }
+      } else {
+        throw Exception('Failed to convert the combined image.');
       }
-    } else {
-      Navigator.of(context).pop(); // Close the saving dialog
-      await _showSaveFailureDialog(); // Show failure dialog
-      print("Error: Failed to render the image.");
+    } catch (e) {
+      Navigator.of(context).pop();
+      await _showSaveFailureDialog();
+      print("Error during saving: $e");
     }
+  }
+
+  // Helper method to convert ByteData to ui.Image
+  Future<ui.Image> _loadImage(ByteData byteData) async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(byteData.buffer.asUint8List(), (ui.Image img) {
+      completer.complete(img);
+    });
+    return completer.future;
+  }
+
+  // Helper method to create a white background image
+  Future<ui.Image> _createWhiteBackgroundImage(int width, int height) async {
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(
+        recorder, Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()));
+    final Paint paint = Paint()..color = Colors.white;
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), paint);
+    final ui.Picture picture = recorder.endRecording();
+    return picture.toImage(width, height);
+  }
+
+  // Helper method to combine the background and original images
+  Future<ui.Image> _combineImages(
+      ui.Image background, ui.Image foreground) async {
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(
+        recorder,
+        Rect.fromLTWH(
+            0, 0, background.width.toDouble(), background.height.toDouble()));
+    canvas.drawImage(background, Offset.zero, Paint());
+    canvas.drawImage(foreground, Offset.zero, Paint());
+    final ui.Picture picture = recorder.endRecording();
+    return picture.toImage(background.width, background.height);
   }
 
   Future<File?> _saveImageToFile(Uint8List imageBytes) async {
@@ -210,11 +262,11 @@ class _DrawPageState extends State<DrawPage> {
             CupertinoDialogAction(
               child: const Text('확인'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
                 Navigator.pushReplacement(
                   context,
                   CupertinoPageRoute(
-                    builder: (context) => HomePage(), // Navigate to HomePage
+                    builder: (context) => HomePage(),
                   ),
                 );
               },
@@ -236,7 +288,7 @@ class _DrawPageState extends State<DrawPage> {
             CupertinoDialogAction(
               child: const Text('확인'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -245,9 +297,7 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  ///////////////////////////
-
-  Widget _buildStrokeToolbar(BuildContext context) {
+  Widget _buildStrokeToolbar() {
     return ValueListenableBuilder<ScribbleState>(
       valueListenable: notifier,
       builder: (context, state, _) => Row(
@@ -256,7 +306,6 @@ class _DrawPageState extends State<DrawPage> {
         children: [
           for (final w in notifier.widths)
             _buildStrokeButton(
-              context,
               strokeWidth: w,
               state: state,
             ),
@@ -265,8 +314,7 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Widget _buildStrokeButton(
-    BuildContext context, {
+  Widget _buildStrokeButton({
     required double strokeWidth,
     required ScribbleState state,
   }) {
@@ -300,26 +348,26 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Widget _buildColorToolbar(BuildContext context) {
+  Widget _buildColorToolbar() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        _buildColorButton(context, color: CupertinoColors.black),
-        _buildColorButton(context, color: CupertinoColors.systemRed),
-        _buildColorButton(context, color: CupertinoColors.systemGreen),
-        _buildColorButton(context, color: CupertinoColors.systemBlue),
-        _buildColorButton(context, color: CupertinoColors.systemYellow),
-        _buildColorButton(context, color: CupertinoColors.systemPink),
-        _buildColorButton(context, color: CupertinoColors.systemPurple),
-        _buildColorButton(context, color: CupertinoColors.systemTeal),
-        _buildColorButton(context, color: CupertinoColors.systemOrange),
-        _buildEraserButton(context),
+        _buildColorButton(color: CupertinoColors.black),
+        _buildColorButton(color: CupertinoColors.systemRed),
+        _buildColorButton(color: CupertinoColors.systemGreen),
+        _buildColorButton(color: CupertinoColors.systemBlue),
+        _buildColorButton(color: CupertinoColors.systemYellow),
+        _buildColorButton(color: CupertinoColors.systemPink),
+        _buildColorButton(color: CupertinoColors.systemPurple),
+        _buildColorButton(color: CupertinoColors.systemTeal),
+        _buildColorButton(color: CupertinoColors.systemOrange),
+        _buildEraserButton(),
       ],
     );
   }
 
-  Widget _buildEraserButton(BuildContext context) {
+  Widget _buildEraserButton() {
     return ValueListenableBuilder(
       valueListenable: notifier.select((value) => value is Erasing),
       builder: (context, isErasing, child) => ColorButton(
@@ -335,7 +383,7 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Widget _buildPointerModeSwitcher(BuildContext context) {
+  Widget _buildPointerModeSwitcher() {
     return ValueListenableBuilder(
       valueListenable: notifier.select((value) => value.allowedPointersMode),
       builder: (context, value, child) {
@@ -357,8 +405,7 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Widget _buildColorButton(
-    BuildContext context, {
+  Widget _buildColorButton({
     required Color color,
   }) {
     return ValueListenableBuilder(
