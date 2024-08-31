@@ -7,13 +7,11 @@ class ToyCard extends StatelessWidget {
   final int toyId;
   final String toyTitle;
   final String toyUrl;
-  final VoidCallback stopBGM; // BGM을 멈추는 콜백 추가
 
   ToyCard({
     required this.toyId,
     required this.toyTitle,
     required this.toyUrl,
-    required this.stopBGM, // 생성자에서 콜백 초기화
   });
 
   @override
@@ -25,9 +23,6 @@ class ToyCard extends StatelessWidget {
       height: 250, // 카드의 높이
       child: CupertinoButton(
         onPressed: () async {
-          // BGM 멈춤
-          stopBGM();
-
           // 효과음 재생
           try {
             await _audioPlayer.play(AssetSource('sounds/boing.mp3'));
@@ -68,12 +63,42 @@ class ToyCard extends StatelessWidget {
                         return Container(
                           color: Colors.white, // 이미지 로드 실패 시 흰색 네모를 표시
                           child: Center(
-                            child: Text(
-                              '이미지 불러오기 실패',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '이미지 불러오기 실패',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '오류: $error', // 오류 내용을 표시
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 10,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (error.toString().contains('403'))
+                                  Text(
+                                    '403 Forbidden: 권한이 없습니다.',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                              ],
                             ),
                           ),
                         );

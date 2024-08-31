@@ -7,13 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:toystory/widget/settings_button.dart';
 
 class Sidebar extends StatefulWidget {
-  final Function(bool) onBGMChanged;
-  final bool isBGMPlaying;
-
-  Sidebar({
-    required this.onBGMChanged,
-    required this.isBGMPlaying,
-  });
+  Sidebar({Key? key}) : super(key: key);
 
   @override
   _SidebarState createState() => _SidebarState();
@@ -73,19 +67,6 @@ class _SidebarState extends State<Sidebar> {
 
                     Row(
                       children: [
-                        CupertinoButton(
-                          onPressed: () {
-                            widget.onBGMChanged(!widget.isBGMPlaying);
-                          },
-                          padding: EdgeInsets.zero,
-                          child: Icon(
-                            widget.isBGMPlaying
-                                ? CupertinoIcons.speaker_2_fill
-                                : CupertinoIcons.speaker_slash_fill,
-                            size: 30,
-                            color: CupertinoColors.systemIndigo,
-                          ),
-                        ),
                         Flexible(
                           child: SettingsButton(),
                         ),
@@ -159,9 +140,6 @@ class _SidebarState extends State<Sidebar> {
                       child: CupertinoButton(
                         color: CupertinoColors.systemIndigo,
                         onPressed: () {
-                          if (widget.isBGMPlaying) {
-                            widget.onBGMChanged(false);
-                          }
                           _playMagicSound();
                           showMagicDialog(context);
                         },
@@ -204,9 +182,6 @@ class _SidebarState extends State<Sidebar> {
                       child: CupertinoButton(
                         color: CupertinoColors.systemIndigo,
                         onPressed: () {
-                          if (widget.isBGMPlaying) {
-                            widget.onBGMChanged(false);
-                          }
                           _playMagicSound();
                           Navigator.of(context, rootNavigator: true).push(
                             CupertinoPageRoute(

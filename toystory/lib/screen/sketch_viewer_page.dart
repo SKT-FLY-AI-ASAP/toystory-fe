@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/confirm_3d_dialog.dart';
 import 'package:toystory/services/api_service.dart';
+import 'home_page.dart';
 
 class SketchViewer extends StatelessWidget {
   final String title;
@@ -40,6 +41,12 @@ class SketchViewer extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -141,7 +148,7 @@ class SketchViewer extends StatelessWidget {
                     builder: (context) {
                       return CupertinoAlertDialog(
                         title: const Text(
-                          '3D 변환중',
+                          '장난감 생성',
                           style: TextStyle(
                               fontSize: 24, fontFamily: 'cookierun'), // 폰트 변경
                         ),
@@ -151,7 +158,7 @@ class SketchViewer extends StatelessWidget {
                             CupertinoActivityIndicator(radius: 20), // 로딩 인디케이터
                             SizedBox(height: 16),
                             Text(
-                              '3D 변환 중입니다...',
+                              '장난감 생성 중입니다...',
                               style: TextStyle(
                                   fontSize: 18,
                                   fontFamily: 'cookierun'), // 폰트 변경

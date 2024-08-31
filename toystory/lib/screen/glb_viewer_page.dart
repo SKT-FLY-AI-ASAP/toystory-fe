@@ -36,15 +36,18 @@ class _My3DModelState extends State<My3DModel> {
       final response =
           await ApiService().fetch3DItemDetails(contentId: widget.contentId);
       setState(() {
-        stlUrl = response['design_url'];
         contentTitle = response['content_title'];
-        //modelUrl = 'assets/glb/yong.glb'; // 하나의 GLB 파일만 사용
-        modelUrl = response['model_url']; // API에서 받은 3D 모델 파일 URL로 설정
-        //backgroundUrl = 'assets/img/design/8.webp'; // 배경 이미지 URL 설정
+        modelUrl = response['content_url'];
+        backgroundUrl = response['content_bg_url'];
+        backgroundMusicUrl = response['content_bgm_url'];
+        stlUrl = response['design_url'];
+        //modelUrl = 'assets/glb/13.glb'; // 하나의 GLB 파일만 사용
+        // // API에서 받은 3D 모델 파일 URL로 설정
+        //backgroundUrl = 'assets/img/design/9.png'; // 배경 이미지 URL 설정
         //backgroundUrl = response['background_image_url']; // 배경 이미지 URL 설정
-        backgroundUrl = response['background_image_url'];
-        backgroundMusicUrl =
-            'https://asap-bucket.s3.ap-northeast-2.amazonaws.com/bgm/0-1teddybear.mp3'; // 배경 음악 URL 설정
+        //
+        // backgroundMusicUrl =
+        //     'https://asap-bucket.s3.ap-northeast-2.amazonaws.com/bgm/0-1teddybear.mp3'; // 배경 음악 URL 설정
       });
       playBackgroundMusic(); // 배경 음악 재생
     } catch (e) {
@@ -120,7 +123,7 @@ class _My3DModelState extends State<My3DModel> {
           // 배경 이미지 설정
           if (backgroundUrl != null && backgroundUrl!.isNotEmpty)
             Positioned.fill(
-              child: Image.asset(
+              child: Image.network(
                 backgroundUrl!,
                 fit: BoxFit.cover,
               ),
@@ -134,10 +137,10 @@ class _My3DModelState extends State<My3DModel> {
                   backgroundColor: Colors.transparent,
                   src: modelUrl!,
                   alt: contentTitle ?? 'A 3D model of a toy',
-                  ar: false,
+                  //ar: false,
                   autoRotate: true,
                   autoPlay: true,
-                  animationName: 'worldAction',
+                  //animationName: 'worldAction',
                   iosSrc:
                       'https://modelviewer.dev/shared-assets/models/Astronaut.usdz',
                   disableZoom: false,

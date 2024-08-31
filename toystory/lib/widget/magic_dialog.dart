@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:toystory/widget/reusable_dialog.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:toystory/services/api_service.dart';
+import 'package:toystory/screen/home_page.dart';
 
 class MagicDialog extends StatefulWidget {
   const MagicDialog({Key? key}) : super(key: key);
@@ -51,9 +52,8 @@ class _MagicDialogState extends State<MagicDialog> {
   }
 
   Future<void> _createToy(BuildContext context) async {
-    String title = _titleController.text.isNotEmpty
-        ? _titleController.text
-        : "기본 제목"; // 사용자가 title 입력을 안했을 경우 기본 제목 사용
+    String title =
+        _titleController.text.isNotEmpty ? _titleController.text : "기본 제목";
 
     try {
       // 로딩 다이얼로그 표시
@@ -98,6 +98,12 @@ class _MagicDialogState extends State<MagicDialog> {
                 child: const Text('확인'),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
                 },
               ),
             ],
